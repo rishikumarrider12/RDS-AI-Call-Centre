@@ -1,0 +1,9 @@
+{
+  "name": "rds-ai-call-centre-db",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "migrate": "echo 'Run migrations via Supabase CLI or psql'",
+    "seed": "echo 'Run seeds via Supabase CLI or psql'"
+  }
+}
