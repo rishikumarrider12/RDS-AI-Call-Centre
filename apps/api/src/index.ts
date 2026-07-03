@@ -3,7 +3,7 @@ import cors from 'cors'
 import helmet from 'helmet'
 import rateLimit from 'express-rate-limit'
 import { env } from './lib/env'
-import logger from './lib/logger'
+import { logger } from './lib/logger'
 import healthRouter from './routes/health'
 import { errorHandler } from './middleware/error'
 
@@ -31,7 +31,7 @@ app.use('/api', healthRouter)
 
 app.use(errorHandler)
 
-const server = app.listen(env.PORT, () => {
+app.listen(env.PORT, () => {
   logger.info({ port: env.PORT }, 'API server listening')
 })
 
