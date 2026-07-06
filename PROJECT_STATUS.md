@@ -2,14 +2,14 @@
 
 **Company:** Rishi Digital Solutions (RDS)  
 **Owner:** N. Rishi Kumar  
-**Date:** 2026-07-05  
-**Status:** Phase 1, 2, and 3.1 Complete — Authentication Foundation Implemented
+**Date:** 2026-07-06  
+**Status:** Phase 1, 2, 3.1, and 3.2 Complete — Authentication and Authorization Implemented
 
 ---
 
 ## Executive Summary
 
-Phase 1 (Foundation), Phase 2 (Database Architecture), and Phase 3.1 (Authentication Foundation) are **complete**. The monorepo is scaffolded with npm workspaces, both frontend and backend build successfully, linting passes, typechecking is green across all workspaces, and the complete PostgreSQL schema with RLS, indexes, functions, triggers, views, and seeds is in place. Supabase Auth email/password authentication is implemented with secure HttpOnly cookies, session handling, password reset, and email verification. No AI calling or dashboard features have been implemented yet.
+Phase 1 (Foundation), Phase 2 (Database Architecture), Phase 3.1 (Authentication Foundation), and Phase 3.2 (Authorization / RBAC) are **complete**. The monorepo is scaffolded with npm workspaces, both frontend and backend build successfully, linting passes, typechecking is green across all workspaces, and the complete PostgreSQL schema with RLS, indexes, functions, triggers, views, and seeds is in place. Supabase Auth email/password authentication is implemented with secure HttpOnly cookies, session handling, password reset, and email verification. RBAC middleware with `requireRole` and `requireAnyRole` guards is implemented. No AI calling or dashboard features have been implemented yet.
 
 ---
 
@@ -46,7 +46,8 @@ Phase 1 (Foundation), Phase 2 (Database Architecture), and Phase 3.1 (Authentica
 - **2026-07-03:** Phase 1 foundation complete. `npm run build`, `npm run lint`, and `npm run typecheck` all pass across `apps/web`, `apps/api`, and all `packages/*`.
 - **2026-07-04:** Phase 2 database complete. 36 tables, RLS, indexes, functions, triggers, views, seeds, storage buckets, and review fixes all verified.
 - **2026-07-05:** Phase 3.1 authentication foundation complete. Supabase Auth email/password endpoints implemented with secure HttpOnly cookies, session handling, password reset, email verification, and frontend auth pages.
+- **2026-07-06:** Phase 3.2 authorization complete. RBAC middleware with `requireRole` and `requireAnyRole` guards implemented, `/me` endpoint refactored to use `authenticate` middleware, roles populated from Supabase user metadata.
 
 ---
 
-*Last updated: 2026-07-05 by Kilo Architect*
+*Last updated: 2026-07-06 by Kilo Architect*

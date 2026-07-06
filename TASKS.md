@@ -17,7 +17,7 @@
 | 1.4 | Bootstrap frontend project (framework, lint, test, env) | Frontend | pending | Next.js recommended |
 | 1.5 | Provision PostgreSQL and create base schema v0.1 | Backend | done | 36 tables, RLS, indexes, functions, triggers, views, seeds |
 | 1.6 | Implement authentication module (password + OAuth) | Backend | done | Supabase Auth email/password, cookies, reset, verification (Phase 3.1) |
-| 1.7 | Implement authorization (RBAC: super_admin, org_admin, agent, viewer) | Backend | pending | Middleware + guards (Phase 3.2) |
+| 1.7 | Implement authorization (RBAC: super_admin, org_admin, agent, viewer) | Backend | done | Middleware + guards (Phase 3.2) |
 | 1.8 | Write Docker compose for local development | DevOps | pending | app, db, redis, minio |
 | 1.9 | Configure GitHub Actions or CI pipeline skeleton | DevOps | pending | lint, test, build |
 | 1.10 | Deploy staging environment | DevOps | pending | Render / Fly / AWS ECS |
@@ -225,10 +225,10 @@
 
 ## Immediate Next Actions (This Week)
 
-1. **Begin RBAC and Authorization** (Phase 3.2) once approved by owner
-2. **Select CPaaS provider** and obtain sandbox credentials (Owner: Architect)
-3. **Set up shared project management** (GitHub Projects / Linear) with columns aligned to Phases
+1. **Select CPaaS provider** and obtain sandbox credentials (Owner: Architect)
+2. **Set up shared project management** (GitHub Projects / Linear) with columns aligned to Phases
+3. **Begin frontend dashboard and operational pages** (Phase 4)
 
 ---
 
-*Last updated: 2026-07-05 by Kilo Architect*
+*Last updated: 2026-07-06 by Kilo Architect*
