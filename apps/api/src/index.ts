@@ -2,16 +2,28 @@ import express from 'express'
 import cors from 'cors'
 import helmet from 'helmet'
 import rateLimit from 'express-rate-limit'
+import cookieParser from 'cookie-parser'
 import { env } from './lib/env'
 import { logger } from './lib/logger'
 import healthRouter from './routes/health'
+import authRouter from './routes/auth'
 import { errorHandler } from './middleware/error'
 
 const app = express()
 
-app.use(helmet())
-app.use(cors({ origin: env.CORS_ORIGIN.split(','), credentials: true }))
+const corsOrigin = env.CORS_ORIGIN.split(',').map(s => s.trim())
+
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: 'cross-origin' },
+}))
+app.use(cors({
+  origin: corsOrigin,
+  credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Token'],
+  exposedHeaders: ['Content-Range', 'X-Content-Range'],
+}))
 app.use(express.json())
+app.use(cookieParser())
 app.use(
   rateLimit({
     windowMs: 15 * 60 * 1000,
@@ -27,6 +39,7 @@ app.use((req, _res, next) => {
 })
 
 app.use('/health', healthRouter)
+app.use('/api/auth', authRouter)
 app.use('/api', healthRouter)
 
 app.use(errorHandler)

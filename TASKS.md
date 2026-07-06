@@ -15,9 +15,9 @@
 | 1.2 | Initialize monorepo with backend, frontend, shared packages | Backend | pending | pnpm / yarn workspaces or npm workspaces |
 | 1.3 | Bootstrap backend project (framework, lint, test, env) | Backend | pending | Nx / Turborepo or plain workspaces |
 | 1.4 | Bootstrap frontend project (framework, lint, test, env) | Frontend | pending | Next.js recommended |
-| 1.5 | Provision PostgreSQL and create base schema v0.1 | Backend | pending | users, orgs, roles, refresh_tokens, audit_logs |
-| 1.6 | Implement authentication module (password + OAuth) | Backend | pending | JWT + refresh tokens |
-| 1.7 | Implement authorization (RBAC: super_admin, org_admin, agent, viewer) | Backend | pending | Middleware + guards |
+| 1.5 | Provision PostgreSQL and create base schema v0.1 | Backend | done | 36 tables, RLS, indexes, functions, triggers, views, seeds |
+| 1.6 | Implement authentication module (password + OAuth) | Backend | done | Supabase Auth email/password, cookies, reset, verification (Phase 3.1) |
+| 1.7 | Implement authorization (RBAC: super_admin, org_admin, agent, viewer) | Backend | pending | Middleware + guards (Phase 3.2) |
 | 1.8 | Write Docker compose for local development | DevOps | pending | app, db, redis, minio |
 | 1.9 | Configure GitHub Actions or CI pipeline skeleton | DevOps | pending | lint, test, build |
 | 1.10 | Deploy staging environment | DevOps | pending | Render / Fly / AWS ECS |
@@ -32,8 +32,8 @@
 | 1.14 | Shared API client and SDK for frontend | Frontend | pending | axios / fetch wrapper |
 | 1.15 | Organization onboarding wizard API | Backend | pending | Org creation, plan selection |
 | 1.16 | Initial test suite scaffold (backend unit + integration) | QA | pending | Vitest / Jest |
-| 1.17 | Database migration tooling and seed scripts | Backend | pending | Prisma / Drizzle / Knex |
-| 1.18 | Email service (password reset, invitations) | Backend | pending | Resend / Postmark / Nodemailer |
+| 1.17 | Database migration tooling and seed scripts | Backend | done | 8 migrations + 3 seed files with verification |
+| 1.18 | Email service (password reset, invitations) | Backend | done | Handled via Supabase Auth email templates |
 
 ---
 
@@ -74,6 +74,21 @@
 | 2.19 | DND list pre-check before dial | Backend | pending | Regulatory requirement |
 | 2.20 | Voicemail detection | Backend | pending | Detect human vs machine |
 | 2.21 | Call transfer (warm / blind) | Backend | pending | To agent or external number |
+
+---
+
+## Phase 3.1: Authentication Foundation
+
+### P0 — Supabase Auth
+
+| # | Task | Owner | Status | Notes |
+|---|------|-------|--------|-------|
+| 3.1.1 | Implement Supabase Auth service wrapper | Backend | done | signUp, signIn, signOut, forgotPassword, resetPassword, verifyEmail, refreshSession |
+| 3.1.2 | Implement auth middleware (cookie-based) | Backend | done | `authenticate` using HttpOnly cookies, `requireAuth` guard |
+| 3.1.3 | Create auth routes | Backend | done | /register, /login, /logout, /forgot-password, /reset-password, /verify-email, /me, /refresh |
+| 3.1.4 | Implement secure HttpOnly cookies | Backend | done | `rds_access_token`, `rds_refresh_token` with configurable secure/sameSite |
+| 3.1.5 | Create frontend auth pages | Frontend | done | Login, Register, Forgot Password, Reset Password, Verify Email |
+| 3.1.6 | Add CORS + CSRF-ready headers | Backend | done | `X-CSRF-Token` allowed header, `cross-origin` resource policy |
 
 ---
 
@@ -210,12 +225,10 @@
 
 ## Immediate Next Actions (This Week)
 
-1. **Select and lock tech stack** with Architect and CTO (Owner: N. Rishi Kumar)
-2. **Bootstrap repository** with agreed tooling (Owner: Backend Lead)
-3. **Design and approve ERD** for users, orgs, campaigns, calls (Owner: Backend Lead + Architect)
-4. **Select CPaaS provider** and obtain sandbox credentials (Owner: Architect)
-5. **Set up shared project management** (GitHub Projects / Linear) with columns aligned to Phases
+1. **Begin RBAC and Authorization** (Phase 3.2) once approved by owner
+2. **Select CPaaS provider** and obtain sandbox credentials (Owner: Architect)
+3. **Set up shared project management** (GitHub Projects / Linear) with columns aligned to Phases
 
 ---
 
-*Last updated: 2026-07-02 by Kilo Architect*
+*Last updated: 2026-07-05 by Kilo Architect*
