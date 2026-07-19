@@ -7,14 +7,42 @@ import { env } from './lib/env'
 import { logger } from './lib/logger'
 import healthRouter from './routes/health'
 import authRouter from './routes/auth'
+import organizationRouter from './routes/organization'
+import usersRouter from './routes/users'
+import apiKeyRouter from './routes/apikey'
+import campaignRouter from './routes/campaigns'
+import contactListRouter from './routes/contactLists'
+import contactRouter from './routes/contacts'
+import callRouter from './routes/calls'
+import billingRouter from './routes/billing'
+import subscriptionRouter from './routes/subscriptions'
+import webhookRouter from './routes/webhooks'
+import integrationRouter from './routes/integrations'
+import notificationRouter from './routes/notifications'
+import auditRouter from './routes/audit'
+import complianceRouter from './routes/compliance'
+import observabilityRouter from './routes/observability'
+import costRouter from './routes/cost'
+import backupRouter from './routes/backup'
+import performanceRouter from './routes/performance'
+import scalingRouter from './routes/scaling'
 import { errorHandler } from './middleware/error'
+import { initTelemetry, shutdownTelemetry } from './lib/telemetry'
+import { httpRequestsTotal, httpRequestDurationSeconds, serviceUp } from './lib/metrics'
 
 const app = express()
 
 const corsOrigin = env.CORS_ORIGIN.split(',').map(s => s.trim())
 
+// HSTS / HTTPS enforcement (Phase 5.1). Enforced strictly in production,
+// relaxed in development so local HTTP traffic still works.
+const hstsEnabled = env.NODE_ENV === 'production'
 app.use(helmet({
   crossOriginResourcePolicy: { policy: 'cross-origin' },
+  hsts: hstsEnabled
+    ? { maxAge: 63072000, includeSubDomains: true, preload: true }
+    : false,
+  contentSecurityPolicy: false,
 }))
 app.use(cors({
   origin: corsOrigin,
@@ -38,14 +66,60 @@ app.use((req, _res, next) => {
   next()
 })
 
+// Observability: record request metrics (route-normalised) for Prometheus (6.1)
+app.use((req, res, next) => {
+  const start = process.hrtime.bigint()
+  const route = (req.route?.path as string) || req.baseUrl || req.path
+  res.on('finish', () => {
+    const seconds = Number(process.hrtime.bigint() - start) / 1e9
+    const status = String(res.statusCode)
+    httpRequestsTotal.inc({ method: req.method, route, status })
+    httpRequestDurationSeconds.observe({ method: req.method, route, status }, seconds)
+  })
+  next()
+})
+
 app.use('/health', healthRouter)
 app.use('/api/auth', authRouter)
+app.use('/api/organizations', organizationRouter)
+app.use('/api/organizations', usersRouter)
+app.use('/api/organizations', apiKeyRouter)
+app.use('/api/campaigns', campaignRouter)
+app.use('/api/contact-lists', contactListRouter)
+app.use('/api/contacts', contactRouter)
+app.use('/api/calls', callRouter)
+app.use('/api/billing', billingRouter)
+app.use('/api/subscriptions', subscriptionRouter)
+app.use('/api/webhooks', webhookRouter)
+app.use('/api/integrations', integrationRouter)
+app.use('/api/notifications', notificationRouter)
+app.use('/api/audit', auditRouter)
+app.use('/api/compliance', complianceRouter)
+app.use('/api/observability', observabilityRouter)
+app.use('/api/costs', costRouter)
+app.use('/api/backups', backupRouter)
+app.use('/api/performance', performanceRouter)
+app.use('/api/scaling', scalingRouter)
 app.use('/api', healthRouter)
 
 app.use(errorHandler)
 
+// OpenTelemetry must be initialised before the server starts accepting traffic.
+initTelemetry()
+
 app.listen(env.PORT, () => {
   logger.info({ port: env.PORT }, 'API server listening')
 })
+
+// Gracefully flush telemetry on shutdown.
+function gracefulShutdown(signal: string) {
+  logger.info({ signal }, 'shutting down')
+  serviceUp.set(0)
+  shutdownTelemetry()
+    .catch(() => undefined)
+    .finally(() => process.exit(0))
+}
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'))
+process.on('SIGINT', () => gracefulShutdown('SIGINT'))
 
 export default app

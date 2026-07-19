@@ -1,9 +1,12 @@
 import * as React from 'react'
 import { cn } from './utils'
+import { Spinner } from './spinner'
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link'
   size?: 'default' | 'sm' | 'lg' | 'icon'
+  loading?: boolean
+  loadingText?: string
 }
 
 const buttonVariants = (variant: string = 'default', size: string = 'default') => {
@@ -26,13 +29,19 @@ const buttonVariants = (variant: string = 'default', size: string = 'default') =
 }
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant = 'default', size = 'default', ...props }, ref) => {
+  ({ className, variant = 'default', size = 'default', loading = false, loadingText, disabled, children, ...props }, ref) => {
+    const spinnerSize = size === 'sm' ? 16 : size === 'lg' ? 20 : 18
     return (
       <button
         ref={ref}
-        className={cn(className, buttonVariants(variant, size))}
+        className={cn(className, buttonVariants(variant, size), loading && 'cursor-wait')}
+        disabled={disabled || loading}
+        aria-busy={loading || undefined}
         {...props}
-      />
+      >
+        {loading && <Spinner size={spinnerSize} className="mr-2" />}
+        {loading ? (loadingText ?? children) : children}
+      </button>
     )
   }
 )

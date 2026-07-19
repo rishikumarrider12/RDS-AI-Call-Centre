@@ -1,6 +1,8 @@
 'use client'
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { ThemeProvider } from '@/components/ThemeProvider'
+import { ToastProvider } from '@rds/ui'
 import { ReactNode, useState } from 'react'
 
 export function Providers({ children }: { children: ReactNode }) {
@@ -17,6 +19,10 @@ export function Providers({ children }: { children: ReactNode }) {
   )
 
   return (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider>
+        <ToastProvider>{children}</ToastProvider>
+      </ThemeProvider>
+    </QueryClientProvider>
   )
 }

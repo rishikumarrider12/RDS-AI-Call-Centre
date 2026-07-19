@@ -15,7 +15,11 @@
     "paths": {
       "@/*": [
         "./src/*"
-      ]
+      ],
+      "@rds/ui": ["../../packages/ui/src"],
+      "@rds/types": ["../../packages/types/src"],
+      "@rds/utils": ["../../packages/utils/src"],
+      "@rds/config": ["../../packages/config/src"]
     },
     "noEmit": true,
     "isolatedModules": true
