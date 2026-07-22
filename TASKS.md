@@ -240,12 +240,12 @@
 | 6.4 | Database backup and restore runbook | DevOps | done | `backups` table + CRUD API + restore workflow |
 | 6.5 | Load testing and performance baseline | QA | done | `performance_baselines` table + CRUD API, k6 script |
 | 6.6 | Auto-scaling configuration | DevOps | done | `auto_scaling_configs` + `scaling_metrics` tables + API |
+| 6.7 | Multi-region readiness | DevOps | done | `regions` + `organization_regions` tables + API (`/api/regions`, `/api/regions/:id`, `/api/regions/organizations`, `/api/regions/organizations/:id`, `/api/regions/health`); `/dashboard/regions` UI |
 
 ### P1 — Scaling
 
 | # | Task | Owner | Status | Notes |
 |---|------|-------|--------|-------|
-| 6.7 | Multi-region readiness plan | DevOps | pending | Data residency and latency |
 | 6.8 | CDN and asset optimization | DevOps | pending | Frontend static assets |
 | 6.9 | Queue partitioning by org for isolation | Backend | pending | Redis / NATS per org or per region |
 | 6.10 | Feature flags for gradual rollout | Backend | pending | LaunchDarkly / Unleash / simple DB flag |
@@ -425,4 +425,13 @@
 | 6.6c | Auto scaling frontend | Frontend | done | `/dashboard/scaling` with config table, edit dialog, recent metrics |
 | 6.6d | Types + API client | Shared | done | `AutoScalingConfig`, `ScalingMetric` in `@rds/types`; `api.getScalingConfig()` etc. |
 
-*Last updated: 2026-07-18 by Kilo Architect — Phase 6 Milestones 1-6 complete*
+### Milestone 7 — Multi-Region Readiness (Implemented)
+
+| # | Deliverable | Area | Status | Notes |
+|---|-------------|------|--------|-------|
+| 6.7a | Multi-region tables | Backend | done | `regions` + `organization_regions` tables with RLS |
+| 6.7b | Region API | Backend | done | `GET/POST/PUT/DELETE /api/regions`, `GET /api/regions/organizations`, `PUT /api/regions/organizations/:id`, `GET /api/regions/health` |
+| 6.7c | Region frontend | Frontend | done | `/dashboard/regions` with stat cards, regions table, organization mappings table, health panel, create/edit/delete/assign dialogs, 30s refresh |
+| 6.7d | Types + API client | Shared | done | `Region`, `OrganizationRegion`, `RegionHealth` in `@rds/types`; `api.listRegions()`, `api.createRegion()`, `api.updateRegion()`, `api.deleteRegion()`, `api.listOrganizationRegions()`, `api.updateOrganizationRegion()`, `api.getRegionHealth()` |
+
+*Last updated: 2026-07-19 by Kilo Architect — Phase 6.7 (Multi-Region Readiness) complete*

@@ -26,6 +26,7 @@ import costRouter from './routes/cost'
 import backupRouter from './routes/backup'
 import performanceRouter from './routes/performance'
 import scalingRouter from './routes/scaling'
+import regionRouter from './routes/region'
 import { errorHandler } from './middleware/error'
 import { initTelemetry, shutdownTelemetry } from './lib/telemetry'
 import { httpRequestsTotal, httpRequestDurationSeconds, serviceUp } from './lib/metrics'
@@ -100,6 +101,7 @@ app.use('/api/costs', costRouter)
 app.use('/api/backups', backupRouter)
 app.use('/api/performance', performanceRouter)
 app.use('/api/scaling', scalingRouter)
+app.use('/api/regions', regionRouter)
 app.use('/api', healthRouter)
 
 app.use(errorHandler)

@@ -681,5 +681,35 @@ export interface ScalingMetric {
   recordedAt: string
 }
 
+export interface Region {
+  id: string
+  code: string
+  name: string
+  location: string
+  provider: string
+  status: string
+  isPrimary: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+export interface OrganizationRegion {
+  id: string
+  organizationId: string
+  primaryRegionId: string
+  secondaryRegionId: string | null
+  failoverEnabled: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+export interface RegionHealth {
+  region: string
+  latency: number
+  replicationDelay: number
+  status: string
+  failoverReady: boolean
+}
+
 export * from './zod'
 
