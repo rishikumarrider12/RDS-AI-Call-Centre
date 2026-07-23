@@ -739,5 +739,49 @@ export interface FeatureFlagFilter {
   search?: string
 }
 
+export interface AIAgent {
+  id: string
+  organizationId: string
+  name: string
+  description: string | null
+  systemPrompt: string
+  llmProvider: 'openai' | 'anthropic' | 'local'
+  llmModel: string
+  ttsProvider: string
+  ttsVoiceId: string
+  sttProvider: string
+  sttModel: string
+  temperature: number
+  maxTokens: number
+  stopSequences: string[]
+  metadata: Record<string, unknown>
+  status: 'active' | 'inactive' | 'testing'
+  lastTestedAt: string | null
+  createdAt: string
+  updatedAt: string
+}
+
+export interface AIAgentInput {
+  name: string
+  description?: string | null
+  systemPrompt: string
+  llmProvider: 'openai' | 'anthropic' | 'local'
+  llmModel: string
+  ttsProvider: string
+  ttsVoiceId: string
+  sttProvider: string
+  sttModel: string
+  temperature?: number
+  maxTokens?: number
+  stopSequences?: string[]
+  metadata?: Record<string, unknown>
+  status?: 'active' | 'inactive' | 'testing'
+}
+
+export interface AIAgentFilter {
+  search?: string
+  status?: string
+}
+
 export * from './zod'
 

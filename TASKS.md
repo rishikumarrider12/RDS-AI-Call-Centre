@@ -439,4 +439,22 @@
 | 6.7c | Region frontend | Frontend | done | `/dashboard/regions` with stat cards, regions table, organization mappings table, health panel, create/edit/delete/assign dialogs, 30s refresh |
 | 6.7d | Types + API client | Shared | done | `Region`, `OrganizationRegion`, `RegionHealth` in `@rds/types`; `api.listRegions()`, `api.createRegion()`, `api.updateRegion()`, `api.deleteRegion()`, `api.listOrganizationRegions()`, `api.updateOrganizationRegion()`, `api.getRegionHealth()` |
 
-*Last updated: 2026-07-19 by Kilo Architect — Phase 6.7 (Multi-Region Readiness) complete*
+### Milestone 1 — AI Agent Management (Implemented)
+
+| # | Deliverable | Area | Status | Notes |
+|---|-------------|------|--------|-------|
+| 7.1a | AI agent migration | Backend | done | `017_ai_agents.sql` adds `status` + `last_tested_at` to existing `ai_agents` |
+| 7.1b | AI agent API | Backend | done | `GET/POST/PUT/DELETE /api/ai-agents`, `POST /api/ai-agents/:id/duplicate`, `POST /api/ai-agents/:id/test` with role-based auth + audit |
+| 7.1c | AI agent frontend | Frontend | done | `/dashboard/agents` with stat cards, search/filter, table, create/edit/delete/duplicate/test dialogs |
+| 7.1d | Types + API client | Shared | done | `AIAgent`, `AIAgentInput`, `AIAgentFilter` in `@rds/types`; `api.listAIAgents()` etc. |
+
+### Milestone 2 — AI Campaign Orchestration (Implemented)
+
+| # | Deliverable | Area | Status | Notes |
+|---|-------------|------|--------|-------|
+| 7.2a | Campaign orchestration migration | Backend | done | `018_ai_campaigns.sql` adds campaign orchestration support |
+| 7.2b | Campaign orchestration API | Backend | done | Extended `campaign.service.ts` with `start`, `pause`, `resume`, `stop`, `duplicate` + audit; routes `/api/campaigns/:id/start`, `/pause`, `/resume`, `/stop`, `/duplicate` |
+| 7.2c | Campaign orchestration frontend | Frontend | done | Enhanced `/dashboard/campaigns` with stat cards (Total, Active, Paused, Ended), status-aware action buttons (Start/Pause/Resume/Stop/Duplicate), progress indicators |
+| 7.2d | API client | Shared | done | `api.startCampaign()`, `api.pauseCampaign()`, `api.resumeCampaign()`, `api.stopCampaign()`, `api.duplicateCampaign()` |
+
+*Last updated: 2026-07-23 by Kilo Architect — Phase 7.2 (AI Campaign Orchestration) complete*
