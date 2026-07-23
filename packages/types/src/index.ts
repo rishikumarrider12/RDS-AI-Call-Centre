@@ -27,6 +27,8 @@ export type CallStatus =
   | 'failed'
   | 'no-answer'
   | 'busy'
+  | 'paused'
+  | 'transferred'
 
 export type CallOutcome =
   | 'completed'
@@ -43,6 +45,67 @@ export interface CallTranscriptLine {
   text: string
   confidence: number | null
   isFinal: boolean
+}
+
+export interface CallSession {
+  id: string
+  callId: string
+  organizationId: string
+  agentId: string | null
+  contactId: string | null
+  status: 'active' | 'held' | 'transferred' | 'ended'
+  holdReason: string | null
+  transferredToAgentId: string | null
+  startedAt: string
+  endedAt: string | null
+  createdAt: string
+  updatedAt: string
+}
+
+export type CallEventType =
+  | 'start'
+  | 'end'
+  | 'pause'
+  | 'resume'
+  | 'transfer'
+  | 'mute'
+  | 'unmute'
+  | 'hold'
+  | 'unhold'
+  | 'dial'
+  | 'ring'
+  | 'answer'
+  | 'hangup'
+  | 'failed'
+  | 'no_answer'
+  | 'busy'
+
+export interface CallEvent {
+  id: string
+  callId: string
+  organizationId: string
+  eventType: CallEventType
+  payload: Record<string, unknown>
+  createdBy: string | null
+  createdAt: string
+}
+
+export interface CallMetric {
+  id: string
+  callId: string
+  organizationId: string
+  latencyMs: number | null
+  jitterMs: number | null
+  packetLoss: number | null
+  audioQualityScore: number | null
+  sttConfidenceAvg: number | null
+  ttsLatencyMs: number | null
+  aiResponseTimeMs: number | null
+  talkRatioCustomer: number | null
+  talkRatioAgent: number | null
+  silenceSeconds: number | null
+  recordedAt: string
+  createdAt: string
 }
 
 export interface Call {
