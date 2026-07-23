@@ -846,5 +846,156 @@ export interface AIAgentFilter {
   status?: string
 }
 
+export type LLMProvider = 'openai' | 'anthropic' | 'google' | 'openrouter' | 'ollama'
+
+export interface LLMProviderConfig {
+  id: string
+  organizationId: string
+  name: string
+  provider: LLMProvider
+  apiKeyEncrypted?: string | null
+  apiBaseUrl?: string | null
+  defaultModel: string
+  temperature: number
+  maxTokens: number
+  topP?: number | null
+  frequencyPenalty?: number | null
+  presencePenalty?: number | null
+  stopSequences: string[]
+  metadata: Record<string, unknown>
+  isActive: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+export interface LLMProviderInput {
+  name: string
+  provider: LLMProvider
+  apiKey?: string | null
+  apiBaseUrl?: string | null
+  defaultModel: string
+  temperature?: number
+  maxTokens?: number
+  topP?: number | null
+  frequencyPenalty?: number | null
+  presencePenalty?: number | null
+  stopSequences?: string[]
+  metadata?: Record<string, unknown>
+}
+
+export interface PromptTemplate {
+  id: string
+  organizationId: string
+  name: string
+  description: string | null
+  systemPrompt: string
+  userPromptTemplate: string | null
+  variables: string[]
+  tags: string[]
+  version: number
+  isActive: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+export interface PromptTemplateInput {
+  name: string
+  description?: string | null
+  systemPrompt: string
+  userPromptTemplate?: string | null
+  variables?: string[]
+  tags?: string[]
+}
+
+export type ConversationStatus = 'active' | 'ended' | 'failed' | 'transferred'
+
+export interface ConversationIntent {
+  name: string
+  confidence: number
+}
+
+export interface AIConversation {
+  id: string
+  organizationId: string
+  agentId: string | null
+  campaignId: string | null
+  callId: string | null
+  contactId: string | null
+  provider: LLMProvider
+  model: string
+  intent: string | null
+  sentiment: 'positive' | 'neutral' | 'negative' | null
+  status: ConversationStatus
+  startedAt: string
+  endedAt: string | null
+  metadata: Record<string, unknown>
+  createdAt: string
+  updatedAt: string
+}
+
+export interface ConversationMessage {
+  id: string
+  conversationId: string
+  organizationId: string
+  role: 'system' | 'user' | 'assistant' | 'tool'
+  content: string
+  intent: string | null
+  sentiment: 'positive' | 'neutral' | 'negative' | null
+  confidence: number | null
+  tokensUsed: number | null
+  latencyMs: number | null
+  provider: string | null
+  model: string | null
+  metadata: Record<string, unknown>
+  createdAt: string
+}
+
+export interface AIMemory {
+  id: string
+  organizationId: string
+  contactId: string | null
+  agentId: string | null
+  conversationId: string | null
+  memoryType: 'summary' | 'fact' | 'preference' | 'intent' | 'sentiment_history'
+  content: string
+  importanceScore: number
+  expiresAt: string | null
+  metadata: Record<string, unknown>
+  createdAt: string
+  updatedAt: string
+}
+
+export interface LLMUsage {
+  id: string
+  organizationId: string
+  conversationId: string | null
+  messageId: string | null
+  provider: string
+  model: string
+  promptTokens: number
+  completionTokens: number
+  totalTokens: number
+  latencyMs: number | null
+  cost: number | null
+  currency: string
+  recordedAt: string
+  createdAt: string
+}
+
+export interface ConversationSummary {
+  active: number
+  avgResponseTime: number
+  tokenUsage: number
+  dailyCost: number
+  successRate: number
+  aiSatisfaction: number
+}
+
+export interface ConversationDashboard {
+  summary: ConversationSummary
+  conversations: AIConversation[]
+  total: number
+}
+
 export * from './zod'
 
