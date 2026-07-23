@@ -28,6 +28,7 @@ import performanceRouter from './routes/performance'
 import scalingRouter from './routes/scaling'
 import regionRouter from './routes/region'
 import queueRouter from './routes/queues'
+import featureFlagRouter from './routes/featureFlags'
 import { errorHandler } from './middleware/error'
 import { initTelemetry, shutdownTelemetry } from './lib/telemetry'
 import { httpRequestsTotal, httpRequestDurationSeconds, serviceUp } from './lib/metrics'
@@ -104,6 +105,7 @@ app.use('/api/performance', performanceRouter)
 app.use('/api/scaling', scalingRouter)
 app.use('/api/regions', regionRouter)
 app.use('/api/queues', queueRouter)
+app.use('/api/feature-flags', featureFlagRouter)
 app.use('/api', healthRouter)
 
 app.use(errorHandler)

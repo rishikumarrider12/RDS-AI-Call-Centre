@@ -720,5 +720,24 @@ export interface QueueStats {
   delayed: number
 }
 
+export interface FeatureFlag {
+  id: string
+  name: string
+  description: string
+  environment: 'development' | 'staging' | 'production'
+  organizationId: string | null
+  rolloutPercentage: number
+  enabled: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+export interface FeatureFlagFilter {
+  environment?: string
+  status?: 'enabled' | 'disabled'
+  organizationId?: string
+  search?: string
+}
+
 export * from './zod'
 

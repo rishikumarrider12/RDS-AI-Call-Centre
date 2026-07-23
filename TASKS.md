@@ -253,7 +253,7 @@
 
 | # | Task | Owner | Status | Notes |
 |---|------|-------|--------|-------|
-| 6.10 | Feature flags for gradual rollout | Backend | pending | LaunchDarkly / Unleash / simple DB flag |
+| 6.10 | Feature flags for gradual rollout | Backend | done | Feature flag CRUD + toggle API (`/api/feature-flags`, `/api/feature-flags/:id`, `/api/feature-flags/:id/toggle`), `/dashboard/feature-flags` UI with filters, stat cards, and dialogs |
 
 ---
 
