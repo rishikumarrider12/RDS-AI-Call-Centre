@@ -241,13 +241,18 @@
 | 6.5 | Load testing and performance baseline | QA | done | `performance_baselines` table + CRUD API, k6 script |
 | 6.6 | Auto-scaling configuration | DevOps | done | `auto_scaling_configs` + `scaling_metrics` tables + API |
 | 6.7 | Multi-region readiness | DevOps | done | `regions` + `organization_regions` tables + API (`/api/regions`, `/api/regions/:id`, `/api/regions/organizations`, `/api/regions/organizations/:id`, `/api/regions/health`); `/dashboard/regions` UI |
+| 6.8 | CDN and asset optimization | DevOps | done | `next.config.ts` compression, font preconnect+swap, image lazy-loading+decoding, middleware cache headers, standalone output |
 
 ### P1 — Scaling
 
 | # | Task | Owner | Status | Notes |
 |---|------|-------|--------|-------|
-| 6.8 | CDN and asset optimization | DevOps | pending | Frontend static assets |
-| 6.9 | Queue partitioning by org for isolation | Backend | pending | Redis / NATS per org or per region |
+| 6.9 | Queue partitioning by org for isolation | Backend | done | BullMQ queues partitioned by org (`org:{id}:jobs`), stats API (`/api/queues`, `/api/queues/:orgId`, `/api/queues/:orgId/enqueue`), `/dashboard/queues` UI with stats + enqueue dialog |
+
+### P1 — Scaling
+
+| # | Task | Owner | Status | Notes |
+|---|------|-------|--------|-------|
 | 6.10 | Feature flags for gradual rollout | Backend | pending | LaunchDarkly / Unleash / simple DB flag |
 
 ---

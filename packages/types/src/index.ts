@@ -711,5 +711,14 @@ export interface RegionHealth {
   failoverReady: boolean
 }
 
+export interface QueueStats {
+  name: string
+  waiting: number
+  active: number
+  completed: number
+  failed: number
+  delayed: number
+}
+
 export * from './zod'
 

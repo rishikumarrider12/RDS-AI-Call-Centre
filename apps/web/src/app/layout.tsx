@@ -3,11 +3,15 @@ import type { ReactNode } from 'react'
 import { Inter } from 'next/font/google'
 import './globals.css'
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({ subsets: ['latin'], display: 'swap' })
 
 export const metadata: Metadata = {
   title: 'RDS AI Call Centre',
   description: 'Production-ready AI-powered call centre platform',
+  other: {
+    'preconnect': 'https://fonts.googleapis.com',
+    'preconnect-crossorigin': 'https://fonts.gstatic.com',
+  },
 }
 
 export default function RootLayout({

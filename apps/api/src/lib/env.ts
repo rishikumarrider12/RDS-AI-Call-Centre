@@ -12,6 +12,7 @@ export const env = z
     SUPABASE_SERVICE_ROLE_KEY: z.string().optional(),
     COOKIE_SECURE: z.string().optional(),
     COOKIE_SAMESITE: z.string().optional(),
+    REDIS_URL: z.string().url().default('redis://localhost:6379'),
   })
   .parse(process.env)
 
