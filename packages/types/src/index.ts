@@ -223,6 +223,59 @@ export interface Contact {
   updatedAt: string
 }
 
+export interface ContactSegment {
+  id: string
+  organizationId: string
+  name: string
+  description: string | null
+  contactCount: number
+  filters: Record<string, unknown>
+  isActive: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+export interface CsvImportJob {
+  id: string
+  organizationId: string
+  contactListId: string | null
+  contactListName: string | null
+  status: 'pending' | 'processing' | 'completed' | 'failed' | 'cancelled'
+  totalRows: number
+  validRows: number
+  inserted: number
+  duplicatesSkipped: number
+  errors: number
+  errorSamples: Array<{ row: number; message: string }>
+  progressPercent: number
+  startedAt: string | null
+  completedAt: string | null
+  createdAt: string
+  updatedAt: string
+}
+
+export interface DuplicateContactRecord {
+  id: string
+  organizationId: string
+  importJobId: string | null
+  contactId: string
+  duplicateOfPhone: string
+  duplicateContactId: string | null
+  status: 'detected' | 'reviewed' | 'merged' | 'ignored'
+  resolvedAt: string | null
+  createdAt: string
+}
+
+export interface ContactManagementDashboardStats {
+  totalContacts: number
+  activeLists: number
+  importedToday: number
+  duplicateContacts: number
+  importSuccessRate: number
+  activeSegments: number
+}
+
+
 export interface CsvImportRowError {
   row: number
   message: string

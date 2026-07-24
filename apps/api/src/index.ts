@@ -13,6 +13,7 @@ import apiKeyRouter from './routes/apikey'
 import campaignRouter from './routes/campaigns'
 import contactListRouter from './routes/contactLists'
 import contactRouter from './routes/contacts'
+import contactManagementRouter from './routes/contactManagement'
 import callRouter from './routes/calls'
 import billingRouter from './routes/billing'
 import subscriptionRouter from './routes/subscriptions'
@@ -92,6 +93,7 @@ app.use('/api/organizations', apiKeyRouter)
 app.use('/api/campaigns', campaignRouter)
 app.use('/api/contact-lists', contactListRouter)
 app.use('/api/contacts', contactRouter)
+app.use('/api/contacts', contactManagementRouter)
 app.use('/api/calls', callRouter)
 app.use('/api/billing', billingRouter)
 app.use('/api/subscriptions', subscriptionRouter)
