@@ -1050,5 +1050,132 @@ export interface ConversationDashboard {
   total: number
 }
 
+// =============================================
+// Live Call Monitoring (Phase 7.6)
+// =============================================
+
+export interface LiveDashboardStats {
+  activeCalls: number
+  waitingCalls: number
+  connectedAgents: number
+  avgCallDuration: number
+  callsToday: number
+  queueHealth: number
+  successRate: number
+  totalAgents: number
+}
+
+export interface ActiveCall {
+  id: string
+  organizationId: string
+  callId: string
+  agentId: string | null
+  contactId: string | null
+  campaignId: string | null
+  callQueueId: string | null
+  direction: 'outbound' | 'inbound'
+  status: CallStatus
+  toNumber: string
+  fromNumber: string
+  durationSeconds: number
+  startedAt: string | null
+  answeredAt: string | null
+  createdAt: string
+  updatedAt: string
+}
+
+export interface LiveEvent {
+  id: string
+  organizationId: string
+  callId: string | null
+  agentId: string | null
+  eventType: string
+  payload: Record<string, unknown>
+  severity: string
+  createdAt: string
+}
+
+export interface AgentSession {
+  id: string
+  organizationId: string
+  agentId: string
+  status: string
+  currentCallId: string | null
+  activeCallsCount: number
+  completedCallsCount: number
+  failedCallsCount: number
+  totalTalkSeconds: number
+  lastActivityAt: string | null
+  createdAt: string
+  updatedAt: string
+}
+
+export interface LiveMetric {
+  id: string
+  organizationId: string
+  metricType: string
+  value: number
+  metadata: Record<string, unknown>
+  recordedAt: string
+  createdAt: string
+}
+
+export interface QueueMetric {
+  id: string
+  organizationId: string
+  callQueueId: string | null
+  queueName: string
+  waitingCount: number
+  activeCount: number
+  completedCount: number
+  abandonedCount: number
+  avgWaitSeconds: number
+  maxWaitSeconds: number
+  recordedAt: string
+  createdAt: string
+}
+
+export interface QueueOverview {
+  queues: Array<{
+    id: string | null
+    name: string
+    waiting: number
+    active: number
+    completed: number
+    abandoned: number
+    avgWaitSeconds: number
+    maxWaitSeconds: number
+    updatedAt: string
+  }>
+  summary: {
+    totalQueues: number
+    totalWaiting: number
+    totalActive: number
+    totalAbandoned: number
+    avgWaitSeconds: number
+  }
+}
+
+export interface AgentOverview {
+  agents: Array<{
+    id: string
+    status: string
+    activeCalls: number
+    completedCalls: number
+    failedCalls: number
+    totalTalkSeconds: number
+    utilization: number
+    lastActivityAt: string | null
+    currentCallId: string | null
+  }>
+  summary: {
+    total: number
+    busy: number
+    idle: number
+    offline: number
+    avgUtilization: number
+  }
+}
+
 export * from './zod'
 
