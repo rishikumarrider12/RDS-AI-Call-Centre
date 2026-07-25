@@ -10,6 +10,7 @@ import authRouter from './routes/auth'
 import organizationRouter from './routes/organization'
 import usersRouter from './routes/users'
 import apiKeyRouter from './routes/apikey'
+import apiKeysRouter from './routes/apiKeys'
 import campaignRouter from './routes/campaigns'
 import contactListRouter from './routes/contactLists'
 import contactRouter from './routes/contacts'
@@ -27,6 +28,10 @@ import transactionRouter from './routes/transactions'
 import webhookRouter from './routes/webhooks'
 import integrationRouter from './routes/integrations'
 import notificationRouter from './routes/notifications'
+import oauthRouter from './routes/oauth'
+import notificationChannelRouter from './routes/notificationChannels'
+import notificationTemplateRouter from './routes/notificationTemplates'
+import notificationLogRouter from './routes/notificationLogs'
 import auditRouter from './routes/audit'
 import complianceRouter from './routes/compliance'
 import observabilityRouter from './routes/observability'
@@ -114,6 +119,11 @@ app.use('/api/transactions', transactionRouter)
 app.use('/api/webhooks', webhookRouter)
 app.use('/api/integrations', integrationRouter)
 app.use('/api/notifications', notificationRouter)
+app.use('/api/notification-channels', notificationChannelRouter)
+app.use('/api/notification-templates', notificationTemplateRouter)
+app.use('/api/notification-logs', notificationLogRouter)
+app.use('/api/api-keys', apiKeysRouter)
+app.use('/api/oauth', oauthRouter)
 app.use('/api/audit', auditRouter)
 app.use('/api/compliance', complianceRouter)
 app.use('/api/observability', observabilityRouter)

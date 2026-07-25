@@ -310,10 +310,12 @@ export type ApiKeyStatus = 'active' | 'revoked'
 
 export interface ApiKey {
   id: string
+  organizationId: string
   name: string
   keyPrefix: string
   status: ApiKeyStatus
   permissions: string
+  scopes: string[]
   lastUsedAt: string | null
   expiresAt: string | null
   createdAt: string
@@ -564,7 +566,7 @@ export interface IntegrationProvider {
 // Notifications
 // =============================================
 
-export type NotificationType = 'email' | 'sms' | 'push' | 'in-app'
+export type NotificationType = 'email' | 'sms' | 'push' | 'in-app' | 'slack' | 'discord' | 'teams'
 export type NotificationChannel = 'billing' | 'usage' | 'security' | 'support'
 
 export interface Notification {
@@ -585,6 +587,69 @@ export interface NotificationCategoryPref {
   sms: boolean
   push: boolean
   in_app: boolean
+}
+
+export interface NotificationChannelConfig {
+  id: string
+  organizationId: string
+  name: string
+  type: NotificationType
+  config: Record<string, unknown>
+  isActive: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+export interface NotificationTemplate {
+  id: string
+  organizationId: string
+  channelId: string
+  name: string
+  subject: string | null
+  body: string
+  variables: string[]
+  isActive: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+export interface NotificationLog {
+  id: string
+  organizationId: string
+  channelId: string
+  templateId: string | null
+  recipient: string
+  subject: string | null
+  body: string
+  status: 'pending' | 'sent' | 'failed' | 'delivered' | 'bounced'
+  providerMessageId: string | null
+  errorMessage: string | null
+  sentAt: string | null
+  deliveredAt: string | null
+  openedAt: string | null
+  clickedAt: string | null
+  metadata: Record<string, unknown>
+  createdAt: string
+  updatedAt: string
+}
+
+// =============================================
+// OAuth
+// =============================================
+
+export interface OAuthConnection {
+  id: string
+  organizationId: string
+  userId: string | null
+  provider: string
+  providerUserId: string
+  accessToken: string | null
+  refreshToken: string | null
+  expiresAt: string | null
+  scope: string | null
+  metadata: Record<string, unknown>
+  createdAt: string
+  updatedAt: string
 }
 
 export interface NotificationPreferences {
