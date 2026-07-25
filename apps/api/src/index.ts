@@ -17,7 +17,13 @@ import contactManagementRouter from './routes/contactManagement'
 import liveMonitoringRouter from './routes/liveMonitoring'
 import callRouter from './routes/calls'
 import billingRouter from './routes/billing'
+import billingCenterRouter from './routes/billingCenter'
 import subscriptionRouter from './routes/subscriptions'
+import planRouter from './routes/plans'
+import couponRouter from './routes/coupons'
+import creditRouter from './routes/credits'
+import billingSettingsRouter from './routes/billingSettings'
+import transactionRouter from './routes/transactions'
 import webhookRouter from './routes/webhooks'
 import integrationRouter from './routes/integrations'
 import notificationRouter from './routes/notifications'
@@ -98,7 +104,13 @@ app.use('/api/contacts', contactManagementRouter)
 app.use('/api/live-monitor', liveMonitoringRouter)
 app.use('/api/calls', callRouter)
 app.use('/api/billing', billingRouter)
+app.use('/api/billing-center', billingCenterRouter)
 app.use('/api/subscriptions', subscriptionRouter)
+app.use('/api/plans', planRouter)
+app.use('/api/coupons', couponRouter)
+app.use('/api/credits', creditRouter)
+app.use('/api/billing-settings', billingSettingsRouter)
+app.use('/api/transactions', transactionRouter)
 app.use('/api/webhooks', webhookRouter)
 app.use('/api/integrations', integrationRouter)
 app.use('/api/notifications', notificationRouter)

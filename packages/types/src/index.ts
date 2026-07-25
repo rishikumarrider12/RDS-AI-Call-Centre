@@ -417,6 +417,82 @@ export interface BillingDashboard {
   }
 }
 
+export interface Plan {
+  id: string
+  organizationId: string
+  name: string
+  slug: string
+  description: string | null
+  priceMonthly: number
+  priceYearly: number
+  currency: string
+  limits: Record<string, unknown>
+  features: Array<Record<string, unknown>>
+  isActive: boolean
+  sortOrder: number
+  createdAt: string
+  updatedAt: string
+}
+
+export interface Coupon {
+  id: string
+  organizationId: string
+  code: string
+  description: string | null
+  discountType: 'percentage' | 'fixed' | 'free_trial'
+  discountValue: number
+  currency: string
+  maxRedemptions: number | null
+  redeemedCount: number
+  validFrom: string | null
+  validUntil: string | null
+  appliesToPlan: string | null
+  isActive: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+export interface Credit {
+  id: string
+  organizationId: string
+  amount: number
+  currency: string
+  reason: string | null
+  expiresAt: string | null
+  createdAt: string
+  updatedAt: string
+}
+
+export interface Transaction {
+  id: string
+  organizationId: string
+  type: 'payment' | 'refund' | 'credit' | 'debit' | 'adjustment'
+  amount: number
+  currency: string
+  invoiceId: string | null
+  paymentId: string | null
+  creditId: string | null
+  description: string | null
+  metadata: Record<string, unknown>
+  createdAt: string
+}
+
+export interface BillingSettings {
+  id: string
+  organizationId: string
+  autoRecharge: boolean
+  autoRechargeThreshold: number | null
+  autoRechargeAmount: number | null
+  currency: string
+  billingEmail: string | null
+  companyName: string | null
+  taxId: string | null
+  address: Record<string, unknown>
+  notificationPreferences: Record<string, unknown>
+  createdAt: string
+  updatedAt: string
+}
+
 // =============================================
 // Webhooks
 // =============================================
