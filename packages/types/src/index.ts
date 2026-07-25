@@ -843,6 +843,104 @@ export interface ObservabilitySnapshot {
   metrics: MetricSample[]
 }
 
+export type SystemHealthComponent = 'database' | 'redis' | 'queue' | 'api' | 'storage' | 'ai_engine' | 'telephony' | 'integration'
+export type SystemHealthStatus = 'healthy' | 'degraded' | 'down' | 'unknown'
+
+export interface SystemHealthCheck {
+  id: string
+  organizationId: string
+  component: SystemHealthComponent
+  status: SystemHealthStatus
+  latencyMs: number | null
+  details: Record<string, unknown>
+  checkedAt: string
+  createdAt: string
+}
+
+export type AlertCondition = 'gt' | 'gte' | 'lt' | 'lte' | 'eq' | 'neq'
+export type AlertSeverity = 'info' | 'warning' | 'error' | 'critical'
+
+export interface AlertRule {
+  id: string
+  organizationId: string
+  name: string
+  description: string | null
+  metric: string
+  condition: AlertCondition
+  threshold: number
+  windowSeconds: number
+  severity: AlertSeverity
+  isActive: boolean
+  channels: Record<string, unknown>[]
+  createdAt: string
+  updatedAt: string
+}
+
+export interface AlertHistory {
+  id: string
+  organizationId: string
+  ruleId: string | null
+  severity: AlertSeverity
+  metric: string
+  value: number
+  threshold: number
+  message: string
+  status: 'firing' | 'resolved' | 'silenced'
+  resolvedAt: string | null
+  createdAt: string
+  updatedAt: string
+}
+
+export type DeploymentEnvironment = 'staging' | 'production' | 'preview'
+export type DeploymentStatus = 'pending' | 'deploying' | 'success' | 'failed' | 'rolled_back'
+
+export interface Deployment {
+  id: string
+  organizationId: string
+  environment: DeploymentEnvironment
+  version: string
+  commitSha: string | null
+  status: DeploymentStatus
+  deployedById: string | null
+  startedAt: string | null
+  completedAt: string | null
+  rollbackOfId: string | null
+  metadata: Record<string, unknown>
+  createdAt: string
+  updatedAt: string
+}
+
+export interface MaintenanceWindow {
+  id: string
+  organizationId: string
+  title: string
+  description: string | null
+  startsAt: string
+  endsAt: string
+  isActive: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+export type ScheduledJobType = 'metrics_cleanup' | 'report_generation' | 'data_retention' | 'health_check' | 'backup' | 'custom'
+export type ScheduledJobStatus = 'pending' | 'running' | 'success' | 'failed'
+
+export interface ScheduledJob {
+  id: string
+  organizationId: string
+  name: string
+  jobType: ScheduledJobType
+  cron: string
+  payload: Record<string, unknown>
+  lastRunAt: string | null
+  nextRunAt: string | null
+  lastStatus: ScheduledJobStatus
+  lastError: string | null
+  isActive: boolean
+  createdAt: string
+  updatedAt: string
+}
+
 // =============================================
 // Cost Tracking, Usage Accounting, Budgets (Phase 6.2 / 6.3)
 // =============================================

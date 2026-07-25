@@ -39,6 +39,9 @@ import compliancePolicyRouter from './routes/compliancePolicies'
 import accessReviewRouter from './routes/accessReviews'
 import securityIncidentRouter from './routes/securityIncidents'
 import observabilityRouter from './routes/observability'
+import systemHealthRouter from './routes/systemHealth'
+import alertsRouter from './routes/alerts'
+import deploymentsRouter from './routes/deployments'
 import costRouter from './routes/cost'
 import backupRouter from './routes/backup'
 import performanceRouter from './routes/performance'
@@ -135,6 +138,9 @@ app.use('/api/compliance-policies', compliancePolicyRouter)
 app.use('/api/access-reviews', accessReviewRouter)
 app.use('/api/security-incidents', securityIncidentRouter)
 app.use('/api/observability', observabilityRouter)
+app.use('/api/system-health', systemHealthRouter)
+app.use('/api/alerts', alertsRouter)
+app.use('/api/deployments', deploymentsRouter)
 app.use('/api/costs', costRouter)
 app.use('/api/backups', backupRouter)
 app.use('/api/performance', performanceRouter)
