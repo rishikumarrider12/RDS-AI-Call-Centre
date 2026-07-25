@@ -33,7 +33,11 @@ import notificationChannelRouter from './routes/notificationChannels'
 import notificationTemplateRouter from './routes/notificationTemplates'
 import notificationLogRouter from './routes/notificationLogs'
 import auditRouter from './routes/audit'
+import auditCategoryRouter from './routes/auditCategories'
 import complianceRouter from './routes/compliance'
+import compliancePolicyRouter from './routes/compliancePolicies'
+import accessReviewRouter from './routes/accessReviews'
+import securityIncidentRouter from './routes/securityIncidents'
 import observabilityRouter from './routes/observability'
 import costRouter from './routes/cost'
 import backupRouter from './routes/backup'
@@ -125,7 +129,11 @@ app.use('/api/notification-logs', notificationLogRouter)
 app.use('/api/api-keys', apiKeysRouter)
 app.use('/api/oauth', oauthRouter)
 app.use('/api/audit', auditRouter)
+app.use('/api/audit-categories', auditCategoryRouter)
 app.use('/api/compliance', complianceRouter)
+app.use('/api/compliance-policies', compliancePolicyRouter)
+app.use('/api/access-reviews', accessReviewRouter)
+app.use('/api/security-incidents', securityIncidentRouter)
 app.use('/api/observability', observabilityRouter)
 app.use('/api/costs', costRouter)
 app.use('/api/backups', backupRouter)

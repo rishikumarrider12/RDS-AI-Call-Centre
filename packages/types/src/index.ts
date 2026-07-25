@@ -761,6 +761,63 @@ export interface AuditSummary {
   newestAt: string | null
 }
 
+export interface AuditCategory {
+  id: string
+  organizationId: string
+  name: string
+  slug: string
+  description: string | null
+  color: string
+  isActive: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+export interface CompliancePolicy {
+  id: string
+  organizationId: string
+  name: string
+  framework: 'GDPR' | 'SOC2' | 'ISO27001' | 'HIPAA' | 'PCI-DSS' | 'OTHER'
+  description: string | null
+  requirements: Record<string, unknown>[]
+  controls: Record<string, unknown>[]
+  status: 'draft' | 'active' | 'archived'
+  effectiveAt: string | null
+  reviewedAt: string | null
+  createdAt: string
+  updatedAt: string
+}
+
+export interface AccessReview {
+  id: string
+  organizationId: string
+  title: string
+  description: string | null
+  reviewerId: string | null
+  status: 'open' | 'in_progress' | 'completed' | 'archived'
+  startedAt: string
+  dueAt: string | null
+  completedAt: string | null
+  createdAt: string
+  updatedAt: string
+}
+
+export interface SecurityIncident {
+  id: string
+  organizationId: string
+  title: string
+  description: string | null
+  severity: 'low' | 'medium' | 'high' | 'critical'
+  status: 'open' | 'investigating' | 'resolved' | 'closed'
+  reportedById: string | null
+  assignedToId: string | null
+  occurredAt: string | null
+  resolvedAt: string | null
+  metadata: Record<string, unknown>
+  createdAt: string
+  updatedAt: string
+}
+
 // =============================================
 // Observability (Phase 6.1)
 // =============================================
