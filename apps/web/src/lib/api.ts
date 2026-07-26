@@ -2420,6 +2420,37 @@ class ApiClient {
   }
 
   // ============================================
+  // Voice Provider Selection (Phase 8.5)
+  // ============================================
+  async getSelectionTtsProvider(preferredProvider?: string): Promise<{ provider: VoiceProvider | null }> {
+    const params = preferredProvider ? '?preferredProvider=' + encodeURIComponent(preferredProvider) : ''
+    return this.fetchJson<{ provider: VoiceProvider | null }>(`/api/voice-providers/selection/tts${params}`)
+  }
+
+  async getSelectionSttProvider(preferredProvider?: string): Promise<{ provider: VoiceProvider | null }> {
+    const params = preferredProvider ? '?preferredProvider=' + encodeURIComponent(preferredProvider) : ''
+    return this.fetchJson<{ provider: VoiceProvider | null }>(`/api/voice-providers/selection/stt${params}`)
+  }
+
+  async getAvailableVoices(providerKey: string, language?: string): Promise<{ voices: VoiceModel[] }> {
+    const params = new URLSearchParams()
+    if (language) params.set('language', language)
+    const qs = params.toString()
+    return this.fetchJson<{ voices: VoiceModel[] }>(`/api/voice-providers/selection/voices?providerKey=${encodeURIComponent(providerKey)}${qs ? '&' + qs : ''}`)
+  }
+
+  async getSupportedLanguages(providerKey?: string): Promise<{ languages: Array<{ code: string; name: string }> }> {
+    const params = new URLSearchParams()
+    if (providerKey) params.set('providerKey', providerKey)
+    const qs = params.toString()
+    return this.fetchJson<{ languages: Array<{ code: string; name: string }> }>(`/api/voice-providers/selection/languages${qs ? '?' + qs : ''}`)
+  }
+
+  async getAllRegisteredProviders(): Promise<{ providers: Array<{ key: string; name: string; category: string; isActive: boolean; capabilities: Record<string, unknown> }> }> {
+    return this.fetchJson<{ providers: Array<{ key: string; name: string; category: string; isActive: boolean; capabilities: Record<string, unknown> }> }>('/api/voice-providers/selection/providers')
+  }
+
+  // ============================================
   // Voice Library (Phase 8.4)
   // ============================================
   async listVoices(options?: {

@@ -158,6 +158,8 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 tourId: 'nav-voice-health' },
           { name: 'Streaming', href: '/dashboard/voice-providers/streaming', icon: Headphones, 
 tourId: 'nav-voice-streaming' },
+          { name: 'Provider Selection', href: '/dashboard/voice-providers/selection', icon: Settings2, 
+tourId: 'nav-voice-selection' },
           { name: 'Voice Library', href: '/dashboard/voice-library', icon: Headphones, 
 tourId: 'nav-voice-library' },
           { name: 'Settings', href: '/dashboard/settings', icon: Settings2, tourId: 'nav-settings' },

@@ -5,6 +5,8 @@ import { VoiceProviderService } from '../services/voiceProvider.service'
 import { ProviderCredentialService } from '../services/providerCredential.service'
 import { ProviderHealthService } from '../services/providerHealth.service'
 import { VoiceModelService } from '../services/voiceModel.service'
+import { ProviderSelectionService } from '../services/providerSelection.service'
+import { recordAudit } from '../lib/audit'
 import { logger } from '../lib/logger'
 
 const router = Router()
@@ -12,6 +14,7 @@ const voiceProviderService = new VoiceProviderService()
 const credentialService = new ProviderCredentialService()
 const healthService = new ProviderHealthService()
 const voiceModelService = new VoiceModelService()
+const selectionService = new ProviderSelectionService()
 
 const createProviderSchema = z.object({
   key: z.string().min(1),
@@ -569,6 +572,78 @@ router.delete('/voices/:id', authenticate, async (req: Request, res: Response) =
   } catch (err) {
     logger.error(err, `delete voice ${req.params.id} failed`)
     res.status(500).json({ error: err instanceof Error ? err.message : 'Failed to delete voice' })
+  }
+})
+
+router.get('/selection/tts', authenticate, async (req: Request, res: Response) => {
+  try {
+    const organizationId = req.user?.organizationId ?? ''
+    const preferredProvider = req.query.preferredProvider as string | undefined
+    const provider = await selectionService.selectTtsProvider(organizationId, preferredProvider)
+    res.status(200).json({ provider })
+  } catch (err) {
+    logger.error(err, 'select TTS provider failed')
+    res.status(500).json({ error: err instanceof Error ? err.message : 'Failed to select TTS provider' })
+  }
+})
+
+router.get('/selection/stt', authenticate, async (req: Request, res: Response) => {
+  try {
+    const organizationId = req.user?.organizationId ?? ''
+    const preferredProvider = req.query.preferredProvider as string | undefined
+    const provider = await selectionService.selectSttProvider(organizationId, preferredProvider)
+    res.status(200).json({ provider })
+  } catch (err) {
+    logger.error(err, 'select STT provider failed')
+    res.status(500).json({ error: err instanceof Error ? err.message : 'Failed to select STT provider' })
+  }
+})
+
+const getVoicesSchema = z.object({
+  providerKey: z.string().min(1),
+  language: z.string().optional(),
+})
+
+router.get('/selection/voices', authenticate, async (req: Request, res: Response) => {
+  try {
+    const input = getVoicesSchema.parse(req.query)
+    const voices = await selectionService.getAvailableVoices(input.providerKey, input.language)
+    res.status(200).json({ voices })
+  } catch (err) {
+    logger.error(err, 'get available voices failed')
+    res.status(500).json({ error: err instanceof Error ? err.message : 'Failed to get available voices' })
+  }
+})
+
+const getLanguagesSchema = z.object({
+  providerKey: z.string().optional(),
+})
+
+router.get('/selection/languages', authenticate, async (req: Request, res: Response) => {
+  try {
+    const input = getLanguagesSchema.parse(req.query)
+    const languages = await selectionService.getSupportedLanguages(input.providerKey)
+    res.status(200).json({ languages })
+  } catch (err) {
+    logger.error(err, 'get supported languages failed')
+    res.status(500).json({ error: err instanceof Error ? err.message : 'Failed to get supported languages' })
+  }
+})
+
+router.get('/selection/providers', authenticate, async (req: Request, res: Response) => {
+  try {
+    const providers = await selectionService.listAllProviders()
+    const result = providers.map((p) => ({
+      key: p.key,
+      name: p.name,
+      category: p.category,
+      isActive: p.isActive,
+      capabilities: p.capabilities,
+    }))
+    res.status(200).json({ providers: result })
+  } catch (err) {
+    logger.error(err, 'list all providers failed')
+    res.status(500).json({ error: err instanceof Error ? err.message : 'Failed to list providers' })
   }
 })
 

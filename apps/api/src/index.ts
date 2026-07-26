@@ -52,6 +52,11 @@ import featureFlagRouter from './routes/featureFlags'
 import aiAgentRouter from './routes/aiAgents'
 import conversationRouter from './routes/conversations'
 import voiceProviderRouter from './routes/voiceProviders'
+import { ProviderDIContainer } from './lib/providers/ProviderDIContainer'
+import { ElevenLabsProvider } from './lib/providers/adapters/ElevenLabsProvider'
+import { OpenAIProvider } from './lib/providers/adapters/OpenAIProvider'
+import { AzureSpeechProvider } from './lib/providers/adapters/AzureSpeechProvider'
+import { GoogleCloudSpeechProvider } from './lib/providers/adapters/GoogleCloudSpeechProvider'
 import { errorHandler } from './middleware/error'
 import { initTelemetry, shutdownTelemetry } from './lib/telemetry'
 import { httpRequestsTotal, httpRequestDurationSeconds, serviceUp } from './lib/metrics'
@@ -159,8 +164,15 @@ app.use(errorHandler)
 // OpenTelemetry must be initialised before the server starts accepting traffic.
 initTelemetry()
 
+const di = ProviderDIContainer.getInstance()
+di.registerProviderInstance(new ElevenLabsProvider())
+di.registerProviderInstance(new OpenAIProvider())
+di.registerProviderInstance(new AzureSpeechProvider())
+di.registerProviderInstance(new GoogleCloudSpeechProvider())
+logger.info('Voice providers registered', { count: 4 })
+
 app.listen(env.PORT, () => {
-  logger.info({ port: env.PORT }, 'API server listening')
+   logger.info({ port: env.PORT }, 'API server listening')
 })
 
 // Gracefully flush telemetry on shutdown.
