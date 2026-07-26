@@ -1473,5 +1473,127 @@ export interface AgentOverview {
   }
 }
 
+export type VoiceProviderCategory = 'tts' | 'stt' | 'both'
+
+export interface VoiceProvider {
+  id: string
+  key: string
+  name: string
+  category: VoiceProviderCategory
+  description: string | null
+  configSchema: Record<string, unknown>
+  capabilities: Record<string, unknown>
+  isActive: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+export interface VoiceProviderInput {
+  key: string
+  name: string
+  category: VoiceProviderCategory
+  description?: string | null
+  configSchema?: Record<string, unknown>
+  capabilities?: Record<string, unknown>
+}
+
+export interface ProviderCredential {
+  id: string
+  organizationId: string
+  providerKey: string
+  credentials: Record<string, unknown>
+  isActive: boolean
+  lastVerifiedAt: string | null
+  createdAt: string
+  updatedAt: string
+}
+
+export interface ProviderCredentialInput {
+  providerKey: string
+  credentials: Record<string, unknown>
+}
+
+export interface VoiceModel {
+  id: string
+  providerKey: string
+  modelId: string
+  name: string
+  type: 'tts' | 'stt'
+  language: string
+  gender: 'male' | 'female' | 'neutral' | 'unknown'
+  isActive: boolean
+  metadata: Record<string, unknown>
+  createdAt: string
+  updatedAt: string
+}
+
+export interface VoiceModelInput {
+  providerKey: string
+  modelId: string
+  name: string
+  type: 'tts' | 'stt'
+  language: string
+  gender?: string
+  metadata?: Record<string, unknown>
+}
+
+export interface SupportedLanguage {
+  id: string
+  providerKey: string
+  languageCode: string
+  languageName: string
+  isActive: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+// =============================================
+// Voice Provider Abstraction (Phase 8.1)
+// =============================================
+
+export interface IVoiceProvider {
+  key: string
+  name: string
+  category: VoiceProviderCategory
+  capabilities: Record<string, unknown>
+  isActive: boolean
+  synthesizeSpeech(text: string, voiceId: string, options?: Record<string, unknown>): Promise<{ audioUrl: string; durationMs: number }>
+  transcribeAudio(audioUrl: string, language?: string, options?: Record<string, unknown>): Promise<{ text: string; confidence: number }>
+  getAvailableVoices(language?: string): Promise<VoiceModel[]>
+  getSupportedLanguages(): Promise<SupportedLanguage[]>
+  verifyCredentials(credentials: Record<string, unknown>): Promise<{ valid: boolean; error?: string }>
+}
+
+export interface IVoiceProviderRegistry {
+  register(provider: IVoiceProvider): void
+  unregister(key: string): void
+  getProvider(key: string): IVoiceProvider | undefined
+  getAllProviders(): IVoiceProvider[]
+  getActiveProviders(): IVoiceProvider[]
+  getProvidersByCategory(category: VoiceProviderCategory): IVoiceProvider[]
+  hasProvider(key: string): boolean
+}
+
+export interface IVoiceProviderFactory {
+  createProvider(key: string, config: Record<string, unknown>): IVoiceProvider
+  createProviderFromConfig(providerKey: string, config: Record<string, unknown>): IVoiceProvider
+  registerProviderClass(key: string, providerClass: new (config: Record<string, unknown>) => IVoiceProvider): void
+}
+
+export interface VoiceProviderDependency {
+  key: string
+  name: string
+  category: VoiceProviderCategory
+  capabilities: Record<string, unknown>
+  configSchema: Record<string, unknown>
+  create: (config: Record<string, unknown>) => IVoiceProvider
+}
+
+export interface VoiceProviderConfig {
+  providerKey: string
+  credentials: Record<string, unknown>
+  organizationId: string
+}
+
 export * from './zod'
 

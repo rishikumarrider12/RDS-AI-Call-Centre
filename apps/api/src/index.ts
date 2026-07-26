@@ -51,6 +51,7 @@ import queueRouter from './routes/queues'
 import featureFlagRouter from './routes/featureFlags'
 import aiAgentRouter from './routes/aiAgents'
 import conversationRouter from './routes/conversations'
+import voiceProviderRouter from './routes/voiceProviders'
 import { errorHandler } from './middleware/error'
 import { initTelemetry, shutdownTelemetry } from './lib/telemetry'
 import { httpRequestsTotal, httpRequestDurationSeconds, serviceUp } from './lib/metrics'
@@ -150,6 +151,7 @@ app.use('/api/queues', queueRouter)
 app.use('/api/feature-flags', featureFlagRouter)
 app.use('/api/ai-agents', aiAgentRouter)
 app.use('/api/conversations', conversationRouter)
+app.use('/api/voice-providers', voiceProviderRouter)
 app.use('/api', healthRouter)
 
 app.use(errorHandler)
