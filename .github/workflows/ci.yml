@@ -19,7 +19,7 @@ jobs:
       - run: npm run build --ws --if-present
       - run: npm run lint --ws --if-present || true
       - run: npm run typecheck --ws --if-present || true
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: build-artifacts
