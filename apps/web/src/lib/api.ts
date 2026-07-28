@@ -2494,6 +2494,81 @@ class ApiClient {
   async deleteVoice(id: string): Promise<void> {
     await this.fetchJson<void>(`/api/voice-providers/voices/${id}`, { method: 'DELETE' })
   }
+
+  // ============================================
+  // Call Execution (Phase 8.6)
+  // ============================================
+  async initiateCall(input: {
+    to: string
+    from: string
+    callerId?: string
+    campaignId?: string
+    contactId?: string
+    agentId?: string
+    preferredTtsProvider?: string
+    preferredSttProvider?: string
+    ttsVoiceId?: string
+    metadata?: Record<string, unknown>
+  }): Promise<{ call: { id: string; status: string; providerCallSid: string }; callSid: string }> {
+    return this.fetchJson<{ call: { id: string; status: string; providerCallSid: string }; callSid: string }>(
+      '/api/voice-providers/execute/start',
+      { method: 'POST', body: JSON.stringify(input) }
+    )
+  }
+
+  async answerCall(callSid: string): Promise<{ callSid: string; status: string }> {
+    return this.fetchJson<{ callSid: string; status: string }>(
+      `/api/voice-providers/execute/answer/${callSid}`,
+      { method: 'POST' }
+    )
+  }
+
+  async terminateCall(callSid: string): Promise<{ callSid: string; status: string }> {
+    return this.fetchJson<{ callSid: string; status: string }>(
+      `/api/voice-providers/execute/end/${callSid}`,
+      { method: 'POST' }
+    )
+  }
+
+  async playCallAudio(callSid: string, text: string, voiceId?: string): Promise<{ callSid: string; status: string }> {
+    return this.fetchJson<{ callSid: string; status: string }>(
+      `/api/voice-providers/execute/play-audio/${callSid}`,
+      { method: 'POST', body: JSON.stringify({ text, voiceId }) }
+    )
+  }
+
+  async startCallRecording(callSid: string): Promise<{ callSid: string; recordingUrl: string }> {
+    return this.fetchJson<{ callSid: string; recordingUrl: string }>(
+      `/api/voice-providers/execute/record/${callSid}`,
+      { method: 'POST' }
+    )
+  }
+
+  async stopCallRecording(callSid: string): Promise<{ callSid: string; status: string }> {
+    return this.fetchJson<{ callSid: string; status: string }>(
+      `/api/voice-providers/execute/stop-recording/${callSid}`,
+      { method: 'POST' }
+    )
+  }
+
+  async getCallStatus(callSid: string): Promise<{ status: string; durationMs?: number; recordingUrl?: string }> {
+    return this.fetchJson<{ status: string; durationMs?: number; recordingUrl?: string }>(
+      `/api/voice-providers/execute/status/${callSid}`
+    )
+  }
+
+  async executeCallFlow(input: {
+    callSid: string
+    to: string
+    from: string
+    ttsText: string
+    voiceId?: string
+  }): Promise<{ callSid: string; status: string; recordingUrl?: string }> {
+    return this.fetchJson<{ callSid: string; status: string; recordingUrl?: string }>(
+      `/api/voice-providers/execute/flow/${input.callSid}`,
+      { method: 'POST', body: JSON.stringify(input) }
+    )
+  }
 }
 
 export const api = new ApiClient()

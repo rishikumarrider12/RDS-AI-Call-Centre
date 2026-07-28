@@ -6,6 +6,7 @@ import { ProviderCredentialService } from '../services/providerCredential.servic
 import { ProviderHealthService } from '../services/providerHealth.service'
 import { VoiceModelService } from '../services/voiceModel.service'
 import { ProviderSelectionService } from '../services/providerSelection.service'
+import { CallExecutionService } from '../services/callExecution.service'
 import { recordAudit } from '../lib/audit'
 import { logger } from '../lib/logger'
 
@@ -15,6 +16,7 @@ const credentialService = new ProviderCredentialService()
 const healthService = new ProviderHealthService()
 const voiceModelService = new VoiceModelService()
 const selectionService = new ProviderSelectionService()
+const callExecutionService = new CallExecutionService()
 
 const createProviderSchema = z.object({
   key: z.string().min(1),
@@ -648,3 +650,131 @@ router.get('/selection/providers', authenticate, async (req: Request, res: Respo
 })
 
 export default router
+
+router.post('/execute/start', authenticate, async (req: Request, res: Response) => {
+  try {
+    const schema = z.object({
+      to: z.string().min(1),
+      from: z.string().min(1),
+      callerId: z.string().optional(),
+      campaignId: z.string().uuid().optional(),
+      contactId: z.string().uuid().optional(),
+      agentId: z.string().uuid().optional(),
+      preferredTtsProvider: z.string().optional(),
+      preferredSttProvider: z.string().optional(),
+      ttsVoiceId: z.string().optional(),
+      metadata: z.record(z.unknown()).optional(),
+    })
+    const parsed = schema.safeParse(req.body)
+    if (!parsed.success) {
+      res.status(400).json({ error: 'Invalid input', details: parsed.error.flatten() })
+      return
+    }
+    const organizationId = req.user?.organizationId ?? ''
+    const result = await callExecutionService.startCall({ ...parsed.data, organizationId })
+    res.status(201).json(result)
+  } catch (err) {
+    logger.error(err, 'start call execution failed')
+    res.status(500).json({ error: err instanceof Error ? err.message : 'Failed to start call' })
+  }
+})
+
+router.post('/execute/answer/:callSid', authenticate, async (req: Request, res: Response) => {
+  try {
+    const { callSid } = req.params
+    const organizationId = req.user?.organizationId ?? ''
+    await callExecutionService.answerCall(callSid, organizationId)
+    res.status(200).json({ callSid, status: 'answered' })
+  } catch (err) {
+    logger.error(err, 'answer call failed')
+    res.status(500).json({ error: err instanceof Error ? err.message : 'Failed to answer call' })
+  }
+})
+
+router.post('/execute/end/:callSid', authenticate, async (req: Request, res: Response) => {
+  try {
+    const { callSid } = req.params
+    const organizationId = req.user?.organizationId ?? ''
+    await callExecutionService.endCall(callSid, organizationId)
+    res.status(200).json({ callSid, status: 'ended' })
+  } catch (err) {
+    logger.error(err, 'end call failed')
+    res.status(500).json({ error: err instanceof Error ? err.message : 'Failed to end call' })
+  }
+})
+
+router.post('/execute/play-audio/:callSid', authenticate, async (req: Request, res: Response) => {
+  try {
+    const { callSid } = req.params
+    const organizationId = req.user?.organizationId ?? ''
+    const schema = z.object({ text: z.string().min(1), voiceId: z.string().optional() })
+    const parsed = schema.safeParse(req.body)
+    if (!parsed.success) {
+      res.status(400).json({ error: 'Invalid input', details: parsed.error.flatten() })
+      return
+    }
+    await callExecutionService.playCallAudio(callSid, organizationId, parsed.data.text, parsed.data.voiceId)
+    res.status(200).json({ callSid, status: 'playing' })
+  } catch (err) {
+    logger.error(err, 'play audio failed')
+    res.status(500).json({ error: err instanceof Error ? err.message : 'Failed to play audio' })
+  }
+})
+
+router.post('/execute/record/:callSid', authenticate, async (req: Request, res: Response) => {
+  try {
+    const { callSid } = req.params
+    const organizationId = req.user?.organizationId ?? ''
+    const result = await callExecutionService.recordCall(callSid, organizationId)
+    res.status(200).json(result)
+  } catch (err) {
+    logger.error(err, 'record call failed')
+    res.status(500).json({ error: err instanceof Error ? err.message : 'Failed to record call' })
+  }
+})
+
+router.post('/execute/stop-recording/:callSid', authenticate, async (req: Request, res: Response) => {
+  try {
+    const { callSid } = req.params
+    const organizationId = req.user?.organizationId ?? ''
+    await callExecutionService.stopCallRecording(callSid, organizationId)
+    res.status(200).json({ callSid, status: 'recording-stopped' })
+  } catch (err) {
+    logger.error(err, 'stop recording failed')
+    res.status(500).json({ error: err instanceof Error ? err.message : 'Failed to stop recording' })
+  }
+})
+
+router.get('/execute/status/:callSid', authenticate, async (req: Request, res: Response) => {
+  try {
+    const { callSid } = req.params
+    const result = await callExecutionService.getCallStatus(callSid)
+    res.status(200).json(result)
+  } catch (err) {
+    logger.error(err, 'get call status failed')
+    res.status(500).json({ error: err instanceof Error ? err.message : 'Failed to get call status' })
+  }
+})
+
+router.post('/execute/flow/:callSid', authenticate, async (req: Request, res: Response) => {
+  try {
+    const { callSid } = req.params
+    const organizationId = req.user?.organizationId ?? ''
+    const schema = z.object({
+      to: z.string().min(1),
+      from: z.string().min(1),
+      ttsText: z.string().min(1),
+      voiceId: z.string().optional(),
+    })
+    const parsed = schema.safeParse(req.body)
+    if (!parsed.success) {
+      res.status(400).json({ error: 'Invalid input', details: parsed.error.flatten() })
+      return
+    }
+    const result = await callExecutionService.executeCallFlow({ ...parsed.data, callSid, organizationId })
+    res.status(200).json(result)
+  } catch (err) {
+    logger.error(err, 'execute call flow failed')
+    res.status(500).json({ error: err instanceof Error ? err.message : 'Failed to execute call flow' })
+  }
+})
