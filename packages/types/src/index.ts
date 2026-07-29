@@ -1595,5 +1595,116 @@ export interface VoiceProviderConfig {
   organizationId: string
 }
 
+// =============================================
+// AI Call Intelligence (Phase 8.7)
+// =============================================
+
+export interface AICallSummary {
+  id: string
+  callId: string
+  organizationId: string
+  summary: string
+  sentiment: 'positive' | 'neutral' | 'negative' | null
+  intent: string | null
+  keyTopics: string[]
+  actionItems: string[]
+  riskLevel: 'low' | 'medium' | 'high' | null
+  confidence: number
+  modelUsed: string | null
+  tokensUsed: number | null
+  cost: number | null
+  currency: string
+  createdAt: string
+  updatedAt: string
+}
+
+export interface AICallSummaryInput {
+  summary: string
+  sentiment: 'positive' | 'neutral' | 'negative' | null
+  intent: string | null
+  keyTopics: string[]
+  actionItems: string[]
+  riskLevel: 'low' | 'medium' | 'high' | null
+  confidence: number
+  modelUsed?: string
+  tokensUsed?: number
+  cost?: number
+  currency?: string
+}
+
+export interface AgentAssistSuggestion {
+  id: string
+  callId: string
+  organizationId: string
+  agentId: string | null
+  suggestionType: 'response' | 'escalation' | 'pause' | 'transfer' | 'note' | 'follow_up'
+  content: string
+  priority: 'low' | 'medium' | 'high' | 'urgent'
+  isApplied: boolean
+  appliedAt: string | null
+  metadata: Record<string, unknown>
+  createdAt: string
+}
+
+export interface AgentAssistSuggestionInput {
+  suggestionType: 'response' | 'escalation' | 'pause' | 'transfer' | 'note' | 'follow_up'
+  content: string
+  priority: 'low' | 'medium' | 'high' | 'urgent'
+  metadata?: Record<string, unknown>
+}
+
+export interface CallSentiment {
+  id: string
+  callId: string
+  organizationId: string
+  channel: 'customer' | 'agent' | 'system'
+  sentiment: 'positive' | 'neutral' | 'negative'
+  confidence: number
+  emotion: string | null
+  transcriptLineId: string | null
+  metadata: Record<string, unknown>
+  createdAt: string
+}
+
+export interface CallIntent {
+  id: string
+  callId: string
+  organizationId: string
+  intent: string
+  confidence: number
+  category: string | null
+  entities: Record<string, unknown>
+  metadata: Record<string, unknown>
+  createdAt: string
+}
+
+export interface AICallMetrics {
+  id: string
+  callId: string
+  organizationId: string
+  totalDurationSeconds: number | null
+  talkRatioCustomer: number | null
+  talkRatioAgent: number | null
+  talkRatioSystem: number | null
+  interruptionCount: number | null
+  silenceDurationSeconds: number | null
+  averageSentimentScore: number | null
+  sentimentTrend: 'improving' | 'stable' | 'declining' | null
+  aiResponseLatencyMs: number | null
+  summaryGenerated: boolean
+  createdAt: string
+}
+
+export interface CallIntelligenceDashboard {
+  callId: string
+  summary: AICallSummary | null
+  sentiments: CallSentiment[]
+  intents: CallIntent[]
+  suggestions: AgentAssistSuggestion[]
+  metrics: AICallMetrics | null
+  overallSentiment: 'positive' | 'neutral' | 'negative' | null
+  riskLevel: 'low' | 'medium' | 'high' | null
+}
+
 export * from './zod'
 

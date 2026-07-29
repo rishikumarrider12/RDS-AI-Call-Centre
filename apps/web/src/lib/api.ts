@@ -62,6 +62,11 @@ import {
   PromptTemplate,
   AIMemory,
   LLMUsage,
+  AICallSummary,
+  AgentAssistSuggestion,
+  CallSentiment,
+  CallIntent,
+  AICallMetrics,
   LiveDashboardStats,
   ActiveCall,
   LiveEvent,
@@ -2568,6 +2573,60 @@ class ApiClient {
       `/api/voice-providers/execute/flow/${input.callSid}`,
       { method: 'POST', body: JSON.stringify(input) }
     )
+  }
+
+  // AI Call Intelligence (Phase 8.7)
+
+  async getAISummary(organizationId: string, callId: string): Promise<{ summary: AICallSummary | null }> {
+    return this.fetchJson<{ summary: AICallSummary | null }>(`/api/calling-engine/${callId}/summary`)
+  }
+
+  async generateAISummary(organizationId: string, callId: string, input: {
+    summary: string
+    sentiment?: string
+    riskLevel?: string
+  }): Promise<{ summary: AICallSummary }> {
+    return this.fetchJson<{ summary: AICallSummary }>(`/api/calling-engine/${callId}/summary`, {
+      method: 'POST',
+      body: JSON.stringify(input),
+    })
+  }
+
+  async getAISentiment(organizationId: string, callId: string): Promise<{ sentiments: CallSentiment[] }> {
+    return this.fetchJson<{ sentiments: CallSentiment[] }>(`/api/calling-engine/${callId}/sentiment`)
+  }
+
+  async getAgentAssistSuggestions(organizationId: string, callId: string, options?: {
+    applied?: boolean
+    priority?: string
+    suggestionType?: string
+  }): Promise<{ suggestions: AgentAssistSuggestion[]; total: number; page: number; pageSize: number }> {
+    const qs = new URLSearchParams()
+    if (options?.applied !== undefined) qs.set('applied', String(options.applied))
+    if (options?.priority) qs.set('priority', options.priority)
+    if (options?.suggestionType) qs.set('suggestionType', options.suggestionType)
+    return this.fetchJson<{ suggestions: AgentAssistSuggestion[]; total: number; page: number; pageSize: number }>(
+      `/api/calling-engine/${callId}/agent-assist${qs.toString() ? `?${qs.toString()}` : ''}`
+    )
+  }
+
+  async applyAISuggestion(organizationId: string, callId: string, id: string): Promise<{ suggestion: AgentAssistSuggestion }> {
+    return this.fetchJson<{ suggestion: AgentAssistSuggestion }>(
+      `/api/calling-engine/${callId}/agent-assist/${id}/apply`,
+      { method: 'PATCH' }
+    )
+  }
+
+  async getCallIntents(organizationId: string, callId: string): Promise<{ intents: CallIntent[] }> {
+    return this.fetchJson<{ intents: CallIntent[] }>(`/api/calling-engine/${callId}/intents`)
+  }
+
+  async getAIMetrics(organizationId: string, callId: string): Promise<{ metrics: AICallMetrics | null }> {
+    return this.fetchJson<{ metrics: AICallMetrics | null }>(`/api/calling-engine/${callId}/metrics`)
+  }
+
+  async getAIIntelligence(organizationId: string, callId: string): Promise<{ dashboard: any }> {
+    return this.fetchJson<{ dashboard: any }>(`/api/calling-engine/${callId}/intelligence`)
   }
 }
 

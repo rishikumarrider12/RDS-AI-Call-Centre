@@ -1,14 +1,12 @@
 import { Router, Request, Response } from 'express'
 import { authenticate } from '../middleware/auth'
 import { CallService } from '../services/call.service'
-import { CallingEngineService } from '../services/callingEngine.service'
 import { resolveDbUserId } from '../lib/actors'
 import { logger } from '../lib/logger'
 import { z } from 'zod'
 
 const router = Router()
 const callService = new CallService()
-const callingEngine = new CallingEngineService()
 
 function requireOrg(req: Request): string {
   const orgId = req.user?.organizationId
@@ -97,7 +95,7 @@ router.post('/start', authenticate, async (req: Request, res: Response) => {
     const organizationId = requireOrg(req)
     const input = startCallSchema.parse(req.body)
     const createdById = await resolveDbUserId(req.user!.id)
-    const call = await callingEngine.start(organizationId, createdById, input)
+    const call = await callService.startCall(organizationId, createdById, input)
     res.status(201).json({ call })
   } catch (err) {
     if (err instanceof z.ZodError) {
@@ -113,7 +111,7 @@ router.post('/:id/end', authenticate, async (req: Request, res: Response) => {
   try {
     const organizationId = requireOrg(req)
     const createdById = await resolveDbUserId(req.user!.id)
-    const call = await callingEngine.end(organizationId, createdById, req.params.id)
+    const call = await callService.endCall(organizationId, createdById, req.params.id)
     res.status(200).json({ call })
   } catch (err) {
     logger.error(err, 'end call failed')
@@ -126,7 +124,7 @@ router.post('/:id/pause', authenticate, async (req: Request, res: Response) => {
   try {
     const organizationId = requireOrg(req)
     const createdById = await resolveDbUserId(req.user!.id)
-    const call = await callingEngine.pause(organizationId, createdById, req.params.id)
+    const call = await callService.pauseCall(organizationId, createdById, req.params.id)
     res.status(200).json({ call })
   } catch (err) {
     logger.error(err, 'pause call failed')
@@ -139,7 +137,7 @@ router.post('/:id/resume', authenticate, async (req: Request, res: Response) => 
   try {
     const organizationId = requireOrg(req)
     const createdById = await resolveDbUserId(req.user!.id)
-    const call = await callingEngine.resume(organizationId, createdById, req.params.id)
+    const call = await callService.resumeCall(organizationId, createdById, req.params.id)
     res.status(200).json({ call })
   } catch (err) {
     logger.error(err, 'resume call failed')
@@ -153,7 +151,7 @@ router.post('/:id/transfer', authenticate, async (req: Request, res: Response) =
     const organizationId = requireOrg(req)
     const createdById = await resolveDbUserId(req.user!.id)
     const { toAgentId } = transferCallSchema.parse(req.body)
-    const call = await callingEngine.transfer(organizationId, createdById, req.params.id, toAgentId)
+    const call = await callService.transferCall(organizationId, createdById, req.params.id, toAgentId)
     res.status(200).json({ call })
   } catch (err) {
     if (err instanceof z.ZodError) {
@@ -168,7 +166,7 @@ router.post('/:id/transfer', authenticate, async (req: Request, res: Response) =
 router.get('/:id/transcript', authenticate, async (req: Request, res: Response) => {
   try {
     const organizationId = requireOrg(req)
-    const transcript = await callingEngine.getTranscript(organizationId, req.params.id)
+    const transcript = await callService.getTranscript(organizationId, req.params.id)
     res.status(200).json({ transcript })
   } catch (err) {
     logger.error(err, 'get transcript failed')
@@ -180,7 +178,7 @@ router.get('/:id/transcript', authenticate, async (req: Request, res: Response) 
 router.get('/:id/events', authenticate, async (req: Request, res: Response) => {
   try {
     const organizationId = requireOrg(req)
-    const events = await callingEngine.getEvents(organizationId, req.params.id)
+    const events = await callService.getEvents(organizationId, req.params.id)
     res.status(200).json({ events })
   } catch (err) {
     logger.error(err, 'get events failed')

@@ -36,11 +36,11 @@ export default function CallExecutionPage() {
     onSuccess: (data) => {
       setActiveCallSid(data.callSid)
       setCallStatus('ringing')
-      toast({ title: 'Call started', description: `Call SID: ${data.callSid}` })
+      toast('Call started. SID: ' + data.callSid, 'success')
       queryClient.invalidateQueries({ queryKey: ['active-calls'] })
     },
     onError: (err) => {
-      toast({ title: 'Failed to start call', description: (err as Error).message, variant: 'error' })
+      toast('Failed to start call: ' + (err as Error).message, 'error')
     },
   })
 
@@ -48,10 +48,10 @@ export default function CallExecutionPage() {
     mutationFn: (callSid: string) => api.answerCall(callSid),
     onSuccess: () => {
       setCallStatus('in-progress')
-      toast({ title: 'Call answered' })
+      toast('Call answered', 'info')
     },
     onError: (err) => {
-      toast({ title: 'Failed to answer call', description: (err as Error).message, variant: 'error' })
+      toast('Failed to answer call: ' + (err as Error).message, 'error')
     },
   })
 
@@ -60,11 +60,11 @@ export default function CallExecutionPage() {
     onSuccess: () => {
       setActiveCallSid(null)
       setCallStatus('idle')
-      toast({ title: 'Call ended' })
+      toast('Call ended', 'info')
       queryClient.invalidateQueries({ queryKey: ['active-calls'] })
     },
     onError: (err) => {
-      toast({ title: 'Failed to end call', description: (err as Error).message, variant: 'error' })
+      toast('Failed to end call: ' + (err as Error).message, 'error')
     },
   })
 
@@ -72,30 +72,30 @@ export default function CallExecutionPage() {
     mutationFn: ({ callSid, text, voiceId }: { callSid: string; text: string; voiceId?: string }) =>
       api.playCallAudio(callSid, text, voiceId),
     onSuccess: () => {
-      toast({ title: 'Playing audio' })
+      toast('Playing audio', 'info')
     },
     onError: (err) => {
-      toast({ title: 'Failed to play audio', description: (err as Error).message, variant: 'error' })
+      toast('Failed to play audio: ' + (err as Error).message, 'error')
     },
   })
 
   const startRecordingMutation = useMutation({
     mutationFn: (callSid: string) => api.startCallRecording(callSid),
     onSuccess: () => {
-      toast({ title: 'Recording started' })
+      toast('Recording started', 'info')
     },
     onError: (err) => {
-      toast({ title: 'Failed to start recording', description: (err as Error).message, variant: 'error' })
+      toast('Failed to start recording: ' + (err as Error).message, 'error')
     },
   })
 
   const stopRecordingMutation = useMutation({
     mutationFn: (callSid: string) => api.stopCallRecording(callSid),
     onSuccess: () => {
-      toast({ title: 'Recording stopped' })
+      toast('Recording stopped', 'info')
     },
     onError: (err) => {
-      toast({ title: 'Failed to stop recording', description: (err as Error).message, variant: 'error' })
+      toast('Failed to stop recording: ' + (err as Error).message, 'error')
     },
   })
 
@@ -111,16 +111,16 @@ export default function CallExecutionPage() {
       api.executeCallFlow(input),
     onSuccess: (data) => {
       setCallStatus(data.status)
-      toast({ title: 'Call flow executed', description: `Status: ${data.status}` })
+      toast('Call flow executed. Status: ' + data.status, 'success')
     },
     onError: (err) => {
-      toast({ title: 'Call flow failed', description: (err as Error).message, variant: 'error' })
+      toast('Call flow failed: ' + (err as Error).message, 'error')
     },
   })
 
   const handleStartCall = () => {
     if (!toNumber || !fromNumber) {
-      toast({ title: 'Missing fields', description: 'To and From numbers are required', variant: 'error' })
+      toast('Missing fields: To and From numbers are required', 'error')
       return
     }
     startCallMutation.mutate({

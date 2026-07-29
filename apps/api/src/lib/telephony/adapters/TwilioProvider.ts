@@ -27,7 +27,7 @@ export class TwilioProvider implements ITelephonyProvider {
   private async request(method: string, path: string, body?: Record<string, unknown>): Promise<Response> {
     const url = `https://api.twilio.com/2010-04-01/Accounts/${this.accountSid}${path}`
     const headers = new Headers()
-    headers.set('Authorization', 'Basic ' + btoa(`${this.accountSid}:${this.authToken}`))
+    headers.set('Authorization', 'Basic ' + Buffer.from(`${this.accountSid}:${this.authToken}`).toString('base64'))
     headers.set('Content-Type', 'application/x-www-form-urlencoded')
     const options: RequestInit = { method, headers }
     if (body) {
@@ -103,7 +103,7 @@ export class TwilioProvider implements ITelephonyProvider {
     }
     try {
       const response = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${sid}.json`, {
-        headers: { Authorization: 'Basic ' + btoa(`${sid}:${token}`) },
+         headers: { Authorization: 'Basic ' + Buffer.from(`${sid}:${token}`).toString('base64') },
       })
       if (response.ok) {
         return { valid: true }
@@ -118,7 +118,7 @@ export class TwilioProvider implements ITelephonyProvider {
     const start = Date.now()
     try {
       const response = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${this.accountSid}.json`, {
-        headers: { Authorization: 'Basic ' + btoa(`${this.accountSid}:${this.authToken}`) },
+        headers: { Authorization: 'Basic ' + Buffer.from(`${this.accountSid}:${this.authToken}`).toString('base64') },
       })
       const latencyMs = Date.now() - start
       if (response.ok) {
