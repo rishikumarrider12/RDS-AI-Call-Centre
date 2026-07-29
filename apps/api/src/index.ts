@@ -66,8 +66,6 @@ const app = express()
 
 const corsOrigin = env.CORS_ORIGIN.split(',').map(s => s.trim())
 
-// HSTS / HTTPS enforcement (Phase 5.1). Enforced strictly in production,
-// relaxed in development so local HTTP traffic still works.
 const hstsEnabled = env.NODE_ENV === 'production'
 app.use(helmet({
   crossOriginResourcePolicy: { policy: 'cross-origin' },
@@ -98,7 +96,6 @@ app.use((req, _res, next) => {
   next()
 })
 
-// Observability: record request metrics (route-normalised) for Prometheus (6.1)
 app.use((req, res, next) => {
   const start = process.hrtime.bigint()
   const route = (req.route?.path as string) || req.baseUrl || req.path
@@ -173,18 +170,30 @@ di.registerProviderInstance(new AzureSpeechProvider())
 di.registerProviderInstance(new GoogleCloudSpeechProvider())
 logger.info('Voice providers registered', { count: 4 })
 
-app.listen(env.PORT, () => {
-   logger.info({ port: env.PORT }, 'API server listening')
+const server = app.listen(env.PORT, () => {
+  logger.info({ port: env.PORT }, 'API server listening')
 })
 
-// Gracefully flush telemetry on shutdown.
-function gracefulShutdown(signal: string) {
+// Gracefully close connections and exit.
+async function gracefulShutdown(signal: string): Promise<void> {
   logger.info({ signal }, 'shutting down')
+
   serviceUp.set(0)
-  shutdownTelemetry()
-    .catch(() => undefined)
-    .finally(() => process.exit(0))
+
+  // Stop accepting new connections and wait for existing ones to drain.
+  await new Promise<void>((resolve) => server.close(() => resolve()))
+
+  // Flush telemetry before exiting.
+  try {
+    await shutdownTelemetry()
+  } catch {
+    // Ignore telemetry shutdown errors.
+  }
+
+  logger.info('shutdown complete')
+  process.exit(0)
 }
+
 process.on('SIGTERM', () => gracefulShutdown('SIGTERM'))
 process.on('SIGINT', () => gracefulShutdown('SIGINT'))
 

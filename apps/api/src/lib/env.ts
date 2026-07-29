@@ -18,3 +18,9 @@ export const env = z
 
 export const isCookieSecure = env.COOKIE_SECURE === 'true' || env.NODE_ENV === 'production'
 export const cookieSameSite: 'strict' | 'lax' | 'none' = env.COOKIE_SAMESITE === 'strict' ? 'strict' : 'lax'
+
+if (env.NODE_ENV === 'production') {
+  if (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 32) {
+    throw new Error('JWT_SECRET must be set and at least 32 characters in production')
+  }
+}

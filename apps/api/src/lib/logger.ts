@@ -8,8 +8,16 @@ function maskField(field: string, value: unknown): unknown {
 
 export const logger = pino({
   level: process.env.LOG_LEVEL || 'info',
-  transport: process.env.NODE_ENV === 'development' ? { target: 'pino-pretty' } : undefined,
-  // Serializers mask known PII fields so sensitive data never lands in logs (5.3)
+  transport: process.env.NODE_ENV === 'production'
+    ? undefined
+    : {
+      target: 'pino-pretty',
+      options: {
+        colorize: true,
+        translateTime: 'SYS:dd-MM-yyyy HH:mm:ss',
+        ignore: 'pid,hostname',
+      },
+    },
   serializers: {
     email: (v) => maskField('email', v),
     actorEmail: (v) => maskField('actorEmail', v),
