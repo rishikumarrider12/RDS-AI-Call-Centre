@@ -77,6 +77,10 @@ import {
   NotificationLog,
   OAuthConnection,
   AuditCategory,
+  SystemResource,
+  LogEntry,
+  ProductionConfigEntry,
+  ServiceControlAction,
   CompliancePolicy,
   AccessReview,
   SecurityIncident,
@@ -2627,6 +2631,31 @@ class ApiClient {
 
   async getAIIntelligence(organizationId: string, callId: string): Promise<{ dashboard: any }> {
     return this.fetchJson<{ dashboard: any }>(`/api/calling-engine/${callId}/intelligence`)
+  }
+
+  async getSystemResources(): Promise<{ resources: SystemResource }> {
+    return this.fetchJson<{ resources: SystemResource }>(`/api/operations/resources`)
+  }
+
+  async getRecentLogs(options?: { level?: string; search?: string; limit?: number }): Promise<{ logs: LogEntry[]; total: number }> {
+    const qs = new URLSearchParams()
+    if (options?.level) qs.set('level', options.level)
+    if (options?.search) qs.set('search', options.search)
+    if (options?.limit) qs.set('limit', String(options.limit))
+    const suffix = qs.toString() ? `?${qs.toString()}` : ''
+    return this.fetchJson<{ logs: LogEntry[]; total: number }>(`/api/operations/logs${suffix}`)
+  }
+
+  async getProductionConfig(): Promise<{ config: ProductionConfigEntry[] }> {
+    return this.fetchJson<{ config: ProductionConfigEntry[] }>(`/api/operations/config`)
+  }
+
+  async getServiceControls(): Promise<{ actions: ServiceControlAction[] }> {
+    return this.fetchJson<{ actions: ServiceControlAction[] }>(`/api/operations/controls`)
+  }
+
+  async restartService(): Promise<{ message: string }> {
+    return this.fetchJson<{ message: string }>(`/api/operations/restart`, { method: 'POST' })
   }
 }
 

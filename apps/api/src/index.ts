@@ -53,6 +53,7 @@ import aiAgentRouter from './routes/aiAgents'
 import conversationRouter from './routes/conversations'
 import voiceProviderRouter from './routes/voiceProviders'
 import callingEngineRouter from './routes/callingEngine'
+import operationsRouter from './routes/operations'
 import { ProviderDIContainer } from './lib/providers/ProviderDIContainer'
 import { ElevenLabsProvider } from './lib/providers/adapters/ElevenLabsProvider'
 import { OpenAIProvider } from './lib/providers/adapters/OpenAIProvider'
@@ -156,6 +157,7 @@ app.use('/api/ai-agents', aiAgentRouter)
 app.use('/api/conversations', conversationRouter)
 app.use('/api/voice-providers', voiceProviderRouter)
 app.use('/api/calling-engine', callingEngineRouter)
+app.use('/api/operations', operationsRouter)
 app.use('/api', healthRouter)
 
 app.use(errorHandler)

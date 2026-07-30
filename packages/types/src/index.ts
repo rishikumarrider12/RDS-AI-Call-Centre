@@ -1706,5 +1706,44 @@ export interface CallIntelligenceDashboard {
   riskLevel: 'low' | 'medium' | 'high' | null
 }
 
+// =============================================
+// Production Monitoring & Operations (Phase 9.2)
+// =============================================
+
+export interface SystemResource {
+  cpuUsage: number
+  memoryUsage: number
+  memoryTotal: number
+  memoryFree: number
+  diskUsage: number
+  diskTotal: number
+  diskFree: number
+  uptimeSeconds: number
+  loadAverage: number[]
+  platform: string
+  arch: string
+  hostname: string
+}
+
+export interface LogEntry {
+  id: string
+  timestamp: string
+  level: number | string
+  message: string
+  source?: string
+}
+
+export interface ProductionConfigEntry {
+  key: string
+  value: string | null
+  redacted: boolean
+  description?: string
+}
+
+export interface ServiceControlAction {
+  action: 'restart' | 'shutdown'
+  description: string
+}
+
 export * from './zod'
 

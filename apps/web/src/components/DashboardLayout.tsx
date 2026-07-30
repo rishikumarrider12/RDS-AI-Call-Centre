@@ -51,6 +51,7 @@ import {
   Ticket,
   Receipt,
   HeartPulse,
+  Cog,
 } from 'lucide-react'
 import { useTheme } from '@/components/ThemeProvider'
 import { TourProvider } from '@/components/Tour'
@@ -144,6 +145,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           { name: 'Audit Logs', href: '/dashboard/audit', icon: ScrollText, tourId: 'nav-audit' },
           { name: 'Compliance', href: '/dashboard/compliance', icon: Scale, tourId: 'nav-compliance' },
           { name: 'Monitoring', href: '/dashboard/observability', icon: Activity, tourId: 'nav-observability' },
+          { name: 'Operations', href: '/dashboard/operations', icon: Cog, tourId: 'nav-operations' },
           { name: 'System Health', href: '/dashboard/system-health', icon: HeartPulse, tourId: 'nav-system-health' },
           { name: 'Cost Center', href: '/dashboard/cost', icon: Wallet, tourId: 'nav-cost' },
           { name: 'Backups', href: '/dashboard/backup', icon: Database, tourId: 'nav-backup' },
