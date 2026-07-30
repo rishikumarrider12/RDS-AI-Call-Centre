@@ -92,6 +92,10 @@ import {
   VoiceProviderInput,
   ProviderCredential,
   VoiceModel,
+  MaintenanceWindow,
+  ScheduledJob,
+  DisasterRecoveryConfig,
+  BackupVerificationResult,
 } from '@rds/types'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
@@ -2656,6 +2660,66 @@ class ApiClient {
 
   async restartService(): Promise<{ message: string }> {
     return this.fetchJson<{ message: string }>(`/api/operations/restart`, { method: 'POST' })
+  }
+
+  async listDRConfigs(_organizationId: string): Promise<{ configs: DisasterRecoveryConfig[] }> {
+    return this.fetchJson<{ configs: DisasterRecoveryConfig[] }>(`/api/disaster-recovery`)
+  }
+
+  async getDRConfig(_organizationId: string, id: string): Promise<{ config: DisasterRecoveryConfig }> {
+    return this.fetchJson<{ config: DisasterRecoveryConfig }>(`/api/disaster-recovery/${id}`)
+  }
+
+  async createDRConfig(_organizationId: string, input: any): Promise<{ config: DisasterRecoveryConfig }> {
+    return this.fetchJson<{ config: DisasterRecoveryConfig }>(`/api/disaster-recovery`, { method: 'POST', body: JSON.stringify(input) })
+  }
+
+  async updateDRConfig(_organizationId: string, id: string, input: any): Promise<{ config: DisasterRecoveryConfig }> {
+    return this.fetchJson<{ config: DisasterRecoveryConfig }>(`/api/disaster-recovery/${id}`, { method: 'PATCH', body: JSON.stringify(input) })
+  }
+
+  async deleteDRConfig(_organizationId: string, id: string): Promise<void> {
+    return this.fetchJson<void>(`/api/disaster-recovery/${id}`, { method: 'DELETE' })
+  }
+
+  async runDRDrill(_organizationId: string, id: string): Promise<{ config: DisasterRecoveryConfig }> {
+    return this.fetchJson<{ config: DisasterRecoveryConfig }>(`/api/disaster-recovery/${id}/drill`, { method: 'POST' })
+  }
+
+  async verifyBackups(_organizationId: string): Promise<{ verification: BackupVerificationResult }> {
+    return this.fetchJson<{ verification: BackupVerificationResult }>(`/api/disaster-recovery/verification/status`)
+  }
+
+  async listMaintenanceWindows(_organizationId: string): Promise<{ windows: MaintenanceWindow[] }> {
+    return this.fetchJson<{ windows: MaintenanceWindow[] }>(`/api/maintenance/windows`)
+  }
+
+  async createMaintenanceWindow(_organizationId: string, input: any): Promise<{ window: MaintenanceWindow }> {
+    return this.fetchJson<{ window: MaintenanceWindow }>(`/api/maintenance/windows`, { method: 'POST', body: JSON.stringify(input) })
+  }
+
+  async updateMaintenanceWindow(_organizationId: string, id: string, input: any): Promise<{ window: MaintenanceWindow }> {
+    return this.fetchJson<{ window: MaintenanceWindow }>(`/api/maintenance/windows/${id}`, { method: 'PATCH', body: JSON.stringify(input) })
+  }
+
+  async deleteMaintenanceWindow(_organizationId: string, id: string): Promise<void> {
+    return this.fetchJson<void>(`/api/maintenance/windows/${id}`, { method: 'DELETE' })
+  }
+
+  async listScheduledJobs(_organizationId: string): Promise<{ jobs: ScheduledJob[] }> {
+    return this.fetchJson<{ jobs: ScheduledJob[] }>(`/api/maintenance/jobs`)
+  }
+
+  async createScheduledJob(_organizationId: string, input: any): Promise<{ job: ScheduledJob }> {
+    return this.fetchJson<{ job: ScheduledJob }>(`/api/maintenance/jobs`, { method: 'POST', body: JSON.stringify(input) })
+  }
+
+  async updateScheduledJob(_organizationId: string, id: string, input: any): Promise<{ job: ScheduledJob }> {
+    return this.fetchJson<{ job: ScheduledJob }>(`/api/maintenance/jobs/${id}`, { method: 'PATCH', body: JSON.stringify(input) })
+  }
+
+  async deleteScheduledJob(_organizationId: string, id: string): Promise<void> {
+    return this.fetchJson<void>(`/api/maintenance/jobs/${id}`, { method: 'DELETE' })
   }
 }
 

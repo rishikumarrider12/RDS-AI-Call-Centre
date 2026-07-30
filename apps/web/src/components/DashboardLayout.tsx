@@ -52,6 +52,7 @@ import {
   Receipt,
   HeartPulse,
   Cog,
+  Umbrella,
 } from 'lucide-react'
 import { useTheme } from '@/components/ThemeProvider'
 import { TourProvider } from '@/components/Tour'
@@ -149,6 +150,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           { name: 'System Health', href: '/dashboard/system-health', icon: HeartPulse, tourId: 'nav-system-health' },
           { name: 'Cost Center', href: '/dashboard/cost', icon: Wallet, tourId: 'nav-cost' },
           { name: 'Backups', href: '/dashboard/backup', icon: Database, tourId: 'nav-backup' },
+          { name: 'Disaster Recovery', href: '/dashboard/disaster-recovery', icon: Umbrella, tourId: 'nav-disaster-recovery' },
           { name: 'Performance', href: '/dashboard/performance', icon: Gauge, tourId: 'nav-performance' },
           { name: 'Auto Scaling', href: '/dashboard/scaling', icon: Server, tourId: 'nav-scaling' },
           { name: 'Regions', href: '/dashboard/regions', icon: Globe2, tourId: 'nav-regions' },

@@ -942,6 +942,41 @@ export interface ScheduledJob {
 }
 
 // =============================================
+// Disaster Recovery & Maintenance (Phase 9.3)
+// =============================================
+
+export type DisasterRecoveryStrategy = 'backup_restore' | 'multi_region' | 'active_passive' | 'active_active'
+export type DisasterRecoveryDrillStatus = 'success' | 'failed' | 'partial'
+
+export interface DisasterRecoveryConfig {
+  id: string
+  organizationId: string
+  name: string
+  description: string | null
+  strategy: DisasterRecoveryStrategy
+  rpoMinutes: number
+  rtoMinutes: number
+  backupScheduleCron: string | null
+  primaryRegionId: string | null
+  secondaryRegionId: string | null
+  isActive: boolean
+  lastDrillAt: string | null
+  lastDrillStatus: DisasterRecoveryDrillStatus | null
+  createdAt: string
+  updatedAt: string
+}
+
+export interface BackupVerificationResult {
+  totalBackups: number
+  completedBackups: number
+  failedBackups: number
+  integrityChecksPassed: boolean
+  restoreTestPassed: boolean
+  lastVerifiedAt: string
+  details: string[]
+}
+
+// =============================================
 // Cost Tracking, Usage Accounting, Budgets (Phase 6.2 / 6.3)
 // =============================================
 
