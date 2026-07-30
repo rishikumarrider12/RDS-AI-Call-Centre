@@ -8,9 +8,12 @@ export function errorHandler(
   res: Response,
   _next: NextFunction
 ) {
-  logger.error({ message: err.message, stack: err.stack }, 'unhandled error')
+  const requestId = (req as any).id as string | undefined
+  logger.error({ message: err.message, stack: err.stack, requestId }, 'unhandled error')
   res.status(500).json({
     status: 'error',
     message: env.NODE_ENV === 'production' ? 'Internal server error' : err.message,
+    ...(env.NODE_ENV !== 'production' && { stack: err.stack }),
+    ...(requestId && { requestId }),
   })
 }

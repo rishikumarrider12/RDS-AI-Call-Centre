@@ -13,14 +13,22 @@ export const env = z
     COOKIE_SECURE: z.string().optional(),
     COOKIE_SAMESITE: z.string().optional(),
     REDIS_URL: z.string().url().default('redis://localhost:6379'),
+    TRUST_PROXY: z.string().optional(),
   })
   .parse(process.env)
 
 export const isCookieSecure = env.COOKIE_SECURE === 'true' || env.NODE_ENV === 'production'
 export const cookieSameSite: 'strict' | 'lax' | 'none' = env.COOKIE_SAMESITE === 'strict' ? 'strict' : 'lax'
+export const trustProxy = env.TRUST_PROXY === 'true'
 
 if (env.NODE_ENV === 'production') {
+  const missing: string[] = []
+
   if (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 32) {
-    throw new Error('JWT_SECRET must be set and at least 32 characters in production')
+    missing.push('JWT_SECRET (must be >= 32 characters)')
+  }
+
+  if (missing.length > 0) {
+    throw new Error(`Missing required production environment variables: ${missing.join(', ')}`)
   }
 }

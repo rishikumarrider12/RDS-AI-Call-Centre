@@ -1,6 +1,7 @@
 import express from 'express'
 import cors from 'cors'
 import helmet from 'helmet'
+import compression from 'compression'
 import rateLimit from 'express-rate-limit'
 import cookieParser from 'cookie-parser'
 import { env } from './lib/env'
@@ -67,35 +68,108 @@ import { httpRequestsTotal, httpRequestDurationSeconds, serviceUp } from './lib/
 
 const app = express()
 
-const corsOrigin = env.CORS_ORIGIN.split(',').map(s => s.trim())
+// Trust proxy only if explicitly configured. In production behind a reverse proxy,
+// set TRUST_PROXY=true so req.ip and rate limiting work correctly.
+if (env.NODE_ENV === 'production' && process.env.TRUST_PROXY === 'true') {
+  app.set('trust proxy', 1)
+}
 
-const hstsEnabled = env.NODE_ENV === 'production'
-app.use(helmet({
-  crossOriginResourcePolicy: { policy: 'cross-origin' },
-  hsts: hstsEnabled
-    ? { maxAge: 63072000, includeSubDomains: true, preload: true }
-    : false,
-  contentSecurityPolicy: false,
-}))
-app.use(cors({
-  origin: corsOrigin,
-  credentials: true,
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Token'],
-  exposedHeaders: ['Content-Range', 'X-Content-Range'],
-}))
-app.use(express.json())
+// Security hardening: strict helmet configuration
+const isProduction = env.NODE_ENV === 'production'
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+    hsts: isProduction
+      ? { maxAge: 63072000, includeSubDomains: true, preload: true }
+      : false,
+    contentSecurityPolicy: isProduction
+      ? {
+          directives: {
+            defaultSrc: ["'self'"],
+            styleSrc: ["'self'", "'unsafe-inline'"],
+            scriptSrc: ["'self'"],
+            imgSrc: ["'self'", 'data:', 'https:'],
+            connectSrc: ["'self'"],
+            fontSrc: ["'self'"],
+            objectSrc: ["'none'"],
+            mediaSrc: ["'self'"],
+            frameSrc: ["'none'"],
+          },
+        }
+      : false,
+    referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
+    xssFilter: true,
+    hidePoweredBy: true,
+  })
+)
+
+// CORS: validate exact origins rather than blindly trusting the header
+const allowedOrigins = new Set(env.CORS_ORIGIN.split(',').map((s) => s.trim()))
+app.use(
+  cors({
+    origin: (origin) => {
+      if (!origin || allowedOrigins.has(origin)) {
+        return true
+      }
+      return false
+    },
+    credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Token', 'X-Request-ID'],
+    exposedHeaders: ['Content-Range', 'X-Content-Range', 'X-Request-ID'],
+  })
+)
+
+// Compression: reduce payload sizes for all responses
+app.use(compression())
+
+// Body parsing with size limits to prevent memory exhaustion
+app.use(express.json({ limit: '1mb' }))
+app.use(express.urlencoded({ extended: true, limit: '1mb' }))
 app.use(cookieParser())
+
+// Assign a unique request ID to every incoming request for tracing
+app.use((req, _res, next) => {
+  req.id = req.headers['x-request-id'] as string | undefined || `req-${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`
+  next()
+})
+
+// Ensure every response carries the request ID
+app.use((req, res, next) => {
+  res.setHeader('X-Request-ID', req.id as string)
+  next()
+})
+
+// Cache control: prevent caching of API responses by default
+app.use((req, res, next) => {
+  if (req.path.startsWith('/api/')) {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private')
+  }
+  next()
+})
+
+// Rate limiting: generous but prevents abuse
 app.use(
   rateLimit({
     windowMs: 15 * 60 * 1000,
-    max: 100,
+    max: 1000,
+    standardHeaders: true,
+    legacyHeaders: false,
+  })
+)
+
+// Strict rate limiting for authentication endpoints
+app.use(
+  '/api/auth',
+  rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 20,
     standardHeaders: true,
     legacyHeaders: false,
   })
 )
 
 app.use((req, _res, next) => {
-  logger.info({ method: req.method, path: req.path }, 'incoming request')
+  logger.info({ method: req.method, path: req.path, requestId: req.id }, 'incoming request')
   next()
 })
 
@@ -202,5 +276,16 @@ async function gracefulShutdown(signal: string): Promise<void> {
 
 process.on('SIGTERM', () => gracefulShutdown('SIGTERM'))
 process.on('SIGINT', () => gracefulShutdown('SIGINT'))
+
+// Production hardening: prevent silent crashes
+process.on('uncaughtException', (err) => {
+  logger.error({ message: err.message, stack: err.stack }, 'uncaught exception')
+  gracefulShutdown('uncaughtException')
+})
+
+process.on('unhandledRejection', (reason) => {
+  logger.error({ reason }, 'unhandled rejection')
+  gracefulShutdown('unhandledRejection')
+})
 
 export default app
