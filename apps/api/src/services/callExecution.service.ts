@@ -4,7 +4,6 @@ import { ProviderDIContainer } from '../lib/providers/ProviderDIContainer'
 import { recordAudit } from '../lib/audit'
 import { logger } from '../lib/logger'
 import type { Call } from '@rds/types'
-import type { ITelephonyProvider } from '../lib/telephony/ITelephonyProvider'
 
 export class CallExecutionService {
   private repository = new CallRepository()
@@ -30,8 +29,7 @@ export class CallExecutionService {
       throw new Error('No active TTS provider available')
     }
 
-    const diRegistry = this.diContainer.getRegistry()
-    const telephonyProvider = diRegistry.getProvider('twilio') as ITelephonyProvider | undefined
+    const telephonyProvider = this.diContainer.getTelephonyProvider('twilio')
     if (!telephonyProvider || !telephonyProvider.isActive) {
       throw new Error('No active telephony provider available')
     }
@@ -72,7 +70,7 @@ export class CallExecutionService {
   }
 
   async answerCall(callSid: string, organizationId: string): Promise<void> {
-    const telephonyProvider = this.diContainer.getRegistry().getProvider('twilio') as ITelephonyProvider | undefined
+    const telephonyProvider = this.diContainer.getTelephonyProvider('twilio')
     if (!telephonyProvider) {
       throw new Error('No telephony provider available')
     }
@@ -93,7 +91,7 @@ export class CallExecutionService {
   }
 
   async endCall(callSid: string, organizationId: string): Promise<void> {
-    const telephonyProvider = this.diContainer.getRegistry().getProvider('twilio') as ITelephonyProvider | undefined
+    const telephonyProvider = this.diContainer.getTelephonyProvider('twilio')
     if (!telephonyProvider) {
       throw new Error('No telephony provider available')
     }
@@ -147,7 +145,7 @@ export class CallExecutionService {
     const audioBlob = new Blob(chunks, { type: 'audio/mpeg' })
     const audioUrl = URL.createObjectURL(audioBlob)
 
-    const telephonyProvider = this.diContainer.getRegistry().getProvider('twilio') as ITelephonyProvider | undefined
+    const telephonyProvider = this.diContainer.getTelephonyProvider('twilio')
     if (!telephonyProvider) {
       throw new Error('No telephony provider available')
     }
@@ -156,7 +154,7 @@ export class CallExecutionService {
   }
 
   async recordCall(callSid: string, organizationId: string): Promise<{ recordingUrl: string }> {
-    const telephonyProvider = this.diContainer.getRegistry().getProvider('twilio') as ITelephonyProvider | undefined
+    const telephonyProvider = this.diContainer.getTelephonyProvider('twilio')
     if (!telephonyProvider) {
       throw new Error('No telephony provider available')
     }
@@ -172,7 +170,7 @@ export class CallExecutionService {
   }
 
   async stopCallRecording(callSid: string, organizationId: string): Promise<void> {
-    const telephonyProvider = this.diContainer.getRegistry().getProvider('twilio') as ITelephonyProvider | undefined
+    const telephonyProvider = this.diContainer.getTelephonyProvider('twilio')
     if (!telephonyProvider) {
       throw new Error('No telephony provider available')
     }
@@ -180,7 +178,7 @@ export class CallExecutionService {
   }
 
   async getCallStatus(callSid: string): Promise<{ status: string; durationMs?: number; recordingUrl?: string }> {
-    const telephonyProvider = this.diContainer.getRegistry().getProvider('twilio') as ITelephonyProvider | undefined
+    const telephonyProvider = this.diContainer.getTelephonyProvider('twilio')
     if (!telephonyProvider) {
       throw new Error('No telephony provider available')
     }

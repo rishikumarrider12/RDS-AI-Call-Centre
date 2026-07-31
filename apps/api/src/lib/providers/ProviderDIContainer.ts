@@ -1,4 +1,5 @@
 import type { IVoiceProvider } from './IVoiceProvider'
+import type { ITelephonyProvider } from '../telephony/ITelephonyProvider'
 import { VoiceProviderRegistry } from './VoiceProviderRegistry'
 import { VoiceProviderFactory } from './VoiceProviderFactory'
 import { VoiceProviderFailover } from '../../services/voiceProviderFailover.service'
@@ -19,6 +20,7 @@ export class ProviderDIContainer {
   private factory: VoiceProviderFactory
   private failover: VoiceProviderFailover
   private dependencies: Map<string, ProviderDependency> = new Map()
+  private telephonyProviders: Map<string, ITelephonyProvider> = new Map()
 
   private constructor() {
     this.registry = new VoiceProviderRegistry()
@@ -41,6 +43,10 @@ export class ProviderDIContainer {
   registerProviderInstance(provider: IVoiceProvider): void {
     this.registry.register(provider)
     this.failover.registerProvider(provider)
+  }
+
+  registerTelephonyProvider(provider: ITelephonyProvider): void {
+    this.telephonyProviders.set(provider.key, provider)
   }
 
   getRegistry(): VoiceProviderRegistry {
@@ -93,5 +99,13 @@ export class ProviderDIContainer {
 
   hasProvider(key: string): boolean {
     return this.registry.hasProvider(key)
+  }
+
+  getTelephonyProvider(key: string): ITelephonyProvider | undefined {
+    return this.telephonyProviders.get(key)
+  }
+
+  hasTelephonyProvider(key: string): boolean {
+    return this.telephonyProviders.has(key)
   }
 }

@@ -14,10 +14,12 @@
  */
 
 import { spawn } from 'child_process'
-import { existsSync } from 'fs'
-import { join } from 'path'
+import { existsSync, readFileSync } from 'fs'
+import { join, dirname } from 'path'
+import { fileURLToPath } from 'url'
 
-const ROOT = join(import.meta.dirname, '..')
+const __dirname = dirname(fileURLToPath(import.meta.url))
+const ROOT = join(__dirname, '..')
 
 const checks = {
   passed: 0,
@@ -45,36 +47,47 @@ async function runCommand(command, args = []) {
     const child = spawn(command, args, { stdio: 'pipe' })
     let stdout = ''
     let stderr = ''
+    child.on('error', () => {
+      resolve({ code: -1, stdout: '', stderr: '' })
+    })
     child.stdout.on('data', (data) => { stdout += data.toString() })
     child.stderr.on('data', (data) => { stderr += data.toString() })
-    child.on('close', (code) => resolve({ code, stdout, stderr }))
+    child.on('close', (code) => resolve({ code: code ?? -1, stdout, stderr }))
   })
 }
 
+function readFileOrNull(filePath) {
+  try {
+    return readFileSync(filePath, 'utf-8')
+  } catch {
+    return null
+  }
+}
+
 async function checkNodeVersion() {
-  const { code, stdout } = await runCommand('node', ['--version'])
-  if (code === 0) {
-    const version = stdout.trim()
+  const result = await runCommand('node', ['--version'])
+  if (result.code === 0 && result.stdout.trim()) {
+    const version = result.stdout.trim()
     const major = parseInt(version.replace('v', '').split('.')[0], 10)
-    check('Node.js version >= 20', major >= 20, `found ${version}`)
+    check('Node.js >= 20', major >= 20, `found ${version}`)
   } else {
     check('Node.js installed', false)
   }
 }
 
 async function checkDocker() {
-  const { code } = await runCommand('docker', ['--version'])
-  check('Docker installed', code === 0)
+  const result = await runCommand('docker', ['--version'])
+  check('Docker installed', result.code === 0)
 }
 
 async function checkNpm() {
-  const { code } = await runCommand('npm', ['--version'])
-  check('npm installed', code === 0)
+  const result = await runCommand('npm', ['--version'])
+  check('npm installed', result.code === 0, result.stderr || 'not found in PATH')
 }
 
 async function checkEnvironment() {
-  const envPath = join(ROOT, 'docker', '.env')
-  check('docker/.env exists', existsSync(envPath))
+  const dockerEnvPath = join(ROOT, 'docker', '.env')
+  check('docker/.env exists', existsSync(dockerEnvPath))
 
   const envExamplePath = join(ROOT, 'docker', '.env.production.example')
   check('docker/.env.production.example exists', existsSync(envExamplePath))
@@ -101,8 +114,8 @@ async function checkBuildOutput() {
 async function checkMigrations() {
   const migrationsDir = join(ROOT, 'database', 'migrations')
   if (existsSync(migrationsDir)) {
-    const { stdout } = await runCommand('ls', [migrationsDir])
-    const count = stdout.split('\n').filter(Boolean).length
+    const result = await runCommand('cmd', ['/c', 'dir', migrationsDir])
+    const count = result.stdout.split('\n').filter((line) => line.trim() && !line.includes('<DIR>')).length
     check('Database migrations exist', count > 0, `${count} migration(s) found`)
   } else {
     check('Database migrations directory exists', false)
@@ -115,7 +128,7 @@ async function checkPackageJson() {
 
   if (existsSync(pkgPath)) {
     try {
-      const content = await Bun.file(pkgPath).text()
+      const content = readFileSync(pkgPath, 'utf-8')
       const pkg = JSON.parse(content)
       check('Build script defined', !!pkg.scripts?.build)
       check('Lint script defined', !!pkg.scripts?.lint)
@@ -127,10 +140,9 @@ async function checkPackageJson() {
 }
 
 async function checkSecurity() {
-  // Check for common security misconfigurations
   const nginxConf = join(ROOT, 'docker', 'nginx.conf')
   if (existsSync(nginxConf)) {
-    const content = await Bun.file(nginxConf).text()
+    const content = readFileOrNull(nginxConf) || ''
     check('Nginx server_tokens off', content.includes('server_tokens off'))
     check('Nginx gzip enabled', content.includes('gzip on'))
     check('Nginx rate limiting configured', content.includes('limit_req_zone'))

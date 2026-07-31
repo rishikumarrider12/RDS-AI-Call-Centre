@@ -62,6 +62,8 @@ import { ElevenLabsProvider } from './lib/providers/adapters/ElevenLabsProvider'
 import { OpenAIProvider } from './lib/providers/adapters/OpenAIProvider'
 import { AzureSpeechProvider } from './lib/providers/adapters/AzureSpeechProvider'
 import { GoogleCloudSpeechProvider } from './lib/providers/adapters/GoogleCloudSpeechProvider'
+import { TwilioProvider } from './lib/telephony/adapters/TwilioProvider'
+import { hasTwilioConfig, twilioConfig } from './lib/env'
 import { errorHandler } from './middleware/error'
 import { initTelemetry, shutdownTelemetry } from './lib/telemetry'
 import { httpRequestsTotal, httpRequestDurationSeconds, serviceUp } from './lib/metrics'
@@ -249,6 +251,17 @@ di.registerProviderInstance(new OpenAIProvider())
 di.registerProviderInstance(new AzureSpeechProvider())
 di.registerProviderInstance(new GoogleCloudSpeechProvider())
 logger.info('Voice providers registered', { count: 4 })
+
+if (hasTwilioConfig()) {
+  di.registerTelephonyProvider(new TwilioProvider({
+    accountSid: twilioConfig.accountSid,
+    authToken: twilioConfig.authToken,
+    fromNumber: twilioConfig.fromNumber,
+  }))
+  logger.info('Twilio telephony provider registered')
+} else {
+  logger.warn('Twilio credentials not configured. Call execution features will be unavailable.')
+}
 
 const server = app.listen(env.PORT, () => {
   logger.info({ port: env.PORT }, 'API server listening')
