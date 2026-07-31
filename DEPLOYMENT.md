@@ -184,27 +184,110 @@ Docker Compose sends `SIGTERM` on `docker compose down` or service restart.
 
 ### TLS/SSL with Nginx
 
-Add SSL configuration to `docker/nginx/conf.d/`:
+The `docker/nginx.conf` is configured for HTTPS. The HTTP server block on port 80 redirects all traffic to HTTPS.
+
+#### Certificate requirements
+
+Nginx expects certificate files at these container-internal paths:
+- Certificate: `/etc/nginx/ssl/server.crt`
+- Private key: `/etc/nginx/ssl/server.key`
+
+These paths are mounted from the host via `docker-compose.production.yml` using:
+- `SSL_CERT_PATH` environment variable (default: `../nginx/ssl/server.crt`)
+- `SSL_KEY_PATH` environment variable (default: `../nginx/ssl/server.key`)
+
+#### Obtain staging TLS certificates
+
+**Option A: Let's Encrypt (recommended for staging)**
 
 ```bash
-# Example: SSL termination
-server {
-    listen 443 ssl http2;
-    server_name app.example.com;
+# Install certbot if needed
+sudo apt update && sudo apt install certbot
 
-    ssl_certificate /etc/letsencrypt/live/app.example.com/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/app.example.com/privkey.pem;
+# Obtain certificate (standalone mode, stop nginx container first if needed)
+sudo certbot certonly --standalone -d staging.example.com -d api.staging.example.com
 
-    # ... proxy_pass configs ...
-}
-
-# Redirect HTTP to HTTPS
-server {
-    listen 80;
-    server_name app.example.com;
-    return 301 https://$host$request_uri;
-}
+# Certificates will be placed at:
+# /etc/letsencrypt/live/staging.example.com/fullchain.pem
+# /etc/letsencrypt/live/staging.example.com/privkey.pem
 ```
+
+**Option B: Load balancer TLS termination**
+
+If using AWS ALB, GCP LB, Cloudflare, or similar:
+- Terminate TLS at the load balancer
+- Forward HTTP traffic to nginx port 80
+- No certificate files needed on the Docker host
+
+#### Place certificates for Docker
+
+```bash
+# Create SSL directory
+mkdir -p nginx/ssl
+
+# Copy certificates (Option A)
+sudo cp /etc/letsencrypt/live/staging.example.com/fullchain.pem nginx/ssl/server.crt
+sudo cp /etc/letsencrypt/live/staging.example.com/privkey.pem nginx/ssl/server.key
+
+# Set restrictive permissions
+sudo chmod 600 nginx/ssl/server.key
+sudo chmod 644 nginx/ssl/server.crt
+```
+
+#### Configure nginx and start
+
+```bash
+# Verify nginx configuration syntax (requires nginx installed locally or in container)
+docker run --rm -v $(pwd)/nginx/nginx.conf:/etc/nginx/nginx.conf:ro nginx:1.27-alpine nginx -t
+
+# Start the stack
+docker compose -f docker/docker-compose.production.yml up -d --build
+
+# Verify HTTPS
+curl -I https://staging.example.com/healthz
+curl -I http://staging.example.com/healthz
+# The HTTP request should return 301/308 redirect to HTTPS
+```
+
+#### Certificate renewal (Let's Encrypt)
+
+```bash
+# Test renewal process
+sudo certbot renew --dry-run
+
+# Renew certificates
+sudo certbot renew
+
+# Copy renewed certificates to nginx ssl directory
+sudo cp /etc/letsencrypt/live/staging.example.com/fullchain.pem nginx/ssl/server.crt
+sudo cp /etc/letsencrypt/live/staging.example.com/privkey.pem nginx/ssl/server.key
+
+# Reload nginx
+docker compose -f docker/docker-compose.production.yml exec nginx nginx -s reload
+```
+
+#### Safely replace certificates
+
+```bash
+# 1. Copy new certificate and key to host paths
+cp new-cert.crt nginx/ssl/server.crt
+cp new-key.key nginx/ssl/server.key
+
+# 2. Verify nginx config
+docker run --rm -v $(pwd)/nginx/nginx.conf:/etc/nginx/nginx.conf:ro nginx:1.27-alpine nginx -t
+
+# 3. Reload nginx (zero downtime)
+docker compose -f docker/docker-compose.production.yml exec nginx nginx -s reload
+
+# 4. Verify
+curl -I https://staging.example.com/
+```
+
+#### Security notes
+- Never commit certificate files or private keys to version control
+- `nginx/ssl/` directory should be added to `.gitignore` if not already present
+- Certificate private keys must have `600` permissions
+- Use automated renewal with cron or systemd timer for Let's Encrypt
 
 ---
 

@@ -56,4 +56,10 @@ Thumbs.db
 docker-compose.override.yml
 *.tsbuildinfo
 
+# TLS/SSL certificates and keys
+nginx/ssl/
+*.pem
+*.key
+*.crt
+
 
