@@ -9,7 +9,7 @@
     "clean": "rm -rf dist"
   },
   "devDependencies": {
-    "typescript": "5.7.2",
+    "typescript": "7.0.2",
     "eslint": "9.22.0"
   }
 }
