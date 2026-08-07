@@ -20,7 +20,7 @@
     "@opentelemetry/semantic-conventions": "1.43.0",
     "@supabase/supabase-js": "2.45.0",
     "@types/compression": "^1.8.1",
-    "bcryptjs": "2.4.3",
+    "bcryptjs": "3.0.3",
     "bullmq": "^5.47.0",
     "compression": "^1.8.1",
     "cookie-parser": "1.4.7",
@@ -38,7 +38,7 @@
   },
   "devDependencies": {
     "@eslint/js": "9.22.0",
-    "@types/bcryptjs": "2.4.6",
+    "@types/bcryptjs": "3.0.0",
     "@types/cookie-parser": "1.4.7",
     "@types/cors": "2.8.0",
     "@types/express": "4.17.0",
